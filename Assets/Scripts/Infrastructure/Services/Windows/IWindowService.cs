@@ -1,9 +1,10 @@
 using Configs.WindowConfigs;
+using Services;
 
-namespace Services.Windows
+namespace Infrastructure.Services.Windows
 {
     public interface IWindowService : IService
     {
-        public bool OpenWindow(BaseWindowConfig windowConfig);
+        bool OpenWindow(BaseWindowConfig windowConfig);
     }
 }

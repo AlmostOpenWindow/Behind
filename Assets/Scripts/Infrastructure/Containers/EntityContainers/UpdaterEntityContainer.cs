@@ -2,6 +2,7 @@ using Components.Common;
 using Doom.GamePlay.Components.Common;
 using Doom.Infrastructure.Containers.LogicContainers;
 using Doom.Infrastructure.Containers.UnityApi;
+using Infrastructure.Containers.UnityApi;
 
 namespace Infrastructure.Containers.EntityContainers
 {

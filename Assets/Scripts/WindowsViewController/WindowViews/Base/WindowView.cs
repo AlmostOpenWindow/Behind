@@ -10,6 +10,8 @@ namespace Windows.WindowViews.Base
         
         [SerializeField] 
         private CanvasGroup _canvasGroup;
+
+        public GameObject WindowInstance => gameObject;
         
         protected virtual void DoOpen()
         {
