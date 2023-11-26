@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.elmortem.serializereferenceeditor": {
+      "version": "https://github.com/elmortem/serializereferenceeditor.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8677fdc5903d9944da861c0aa84d653e8bd8b380"
+    },
     "com.unity.burst": {
       "version": "1.8.10",
       "depth": 1,
