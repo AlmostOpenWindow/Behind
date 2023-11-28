@@ -36,7 +36,7 @@ public class SpotLightController : MonoBehaviour
         }
     }
     
-    private IEnumerator EnableAllLightsRoutine()
+    public IEnumerator EnableAllLightsRoutine()
     {
         _spotLightIndex = 0;
         _routineDone = false;
