@@ -30,9 +30,11 @@ using UnityEngine.InputSystem;
         [Tooltip("How fast the character turns to face movement direction")]
         public float RotationSmoothTime = 1f;
         
-        [Tooltip("Acceleration and deceleration")]
-        public float SpeedChangeRate = 10.0f;
+        [Header("Acceleration and deceleration")]
+        public float SpeedAcceleration = 10.0f;
 
+        public float SpeedDeceleration = 5.0f;
+        
         [Header("Movement for FirstPerson View")]
         [Tooltip("Rotation speed of the character")]
         public float RotationSpeed = 1.0f;
@@ -74,26 +76,26 @@ using UnityEngine.InputSystem;
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
 
-        [Tooltip("How far in degrees can you move the camera up")]
-        public float TopClamp = 70.0f;
-
-        [Tooltip("How far in degrees can you move the camera down")]
-        public float BottomClamp = -30.0f;
-
-        [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
-        public float CameraAngleOverride = 0.0f;
-
-        [Tooltip("For locking the camera position on all axis")]
-        public bool LockCameraPosition = false;
-
-        public bool DoCameraClamp = true;
+        // [Tooltip("How far in degrees can you move the camera up")]
+        // public float TopClamp = 70.0f;
+        //
+        // [Tooltip("How far in degrees can you move the camera down")]
+        // public float BottomClamp = -30.0f;
+        //
+        // [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
+        // public float CameraAngleOverride = 0.0f;
+        //
+        // [Tooltip("For locking the camera position on all axis")]
+        // public bool LockCameraPosition = false;
+        //
+        // public bool DoCameraClamp = true;
         
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
 
         // player
-        private float _speed;
+        public float _speed;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
@@ -121,7 +123,8 @@ using UnityEngine.InputSystem;
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
-
+        private Vector3 _cachedInputDirection;
+        
         private bool IsCurrentDeviceMouse
         {
             get
@@ -173,7 +176,7 @@ using UnityEngine.InputSystem;
 
         private void LateUpdate()
         {
-            //Rotation();
+            Rotation();
         }
 
         private void AssignAnimationIDs()
@@ -200,6 +203,45 @@ using UnityEngine.InputSystem;
         //     }
         // }
 
+        private void Rotation()
+        {
+            var t = transform;
+            var delta = new Vector2(
+                Mathf.Abs(_input.look.x) < NoTurn 
+                    ? 0 
+                    : _input.look.x * RotationSpeed, 
+                Mathf.Abs(_input.look.y) < NoTurn 
+                    ? 0 
+                    : _input.look.y * RotationSpeed);
+
+            var tRotation = t.rotation;
+            var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
+            var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
+            
+            Quaternion newRotation = new Quaternion();
+            newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
+
+            Debug.Log("NewRot: " + newRotation.eulerAngles);
+            if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
+            {
+                Debug.Log("clamp up");
+                newRotation.eulerAngles = new Vector3(
+                    MinMaxXRotation.x,
+                    smoothY,
+                    0);
+            }
+            else
+            if (newRotation.eulerAngles.x is >= 0 and < 90)
+            {
+                Debug.Log("clamp down");
+                newRotation.eulerAngles = new Vector3(
+                    Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
+                    smoothY,
+                    0);
+            }
+            Debug.Log(newRotation.eulerAngles);
+            transform.rotation = newRotation;
+        }
         // private void Rotation()
         // {
         //     FPRotation();
@@ -257,19 +299,26 @@ using UnityEngine.InputSystem;
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            var speedAcceleration = SpeedAcceleration;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
+            
+            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+            
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (_input.move == Vector2.zero)
+            {
+                targetSpeed = 0.0f;
+                speedAcceleration = SpeedDeceleration;
+            }
 
             // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            float currentHorizontalSpeed = _controller.velocity.magnitude; 
+            //for only horizontal speed: new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
-            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
-
+            
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -277,7 +326,7 @@ using UnityEngine.InputSystem;
                 // creates curved result rather than a linear one giving a more organic speed change
                 // note T in Lerp is clamped, so we don't need to clamp our speed
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                    Time.deltaTime * SpeedChangeRate);
+                    Time.deltaTime * speedAcceleration);
 
                 // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -287,7 +336,7 @@ using UnityEngine.InputSystem;
                 _speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * speedAcceleration);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
             
             FPMove(); 
@@ -329,49 +378,14 @@ using UnityEngine.InputSystem;
         private void FPMove()
         {
             var t = transform;
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-            
-            var delta = new Vector2(
-                Mathf.Abs(_input.look.x) < NoTurn 
-                    ? 0 
-                    : _input.look.x * RotationSpeed, 
-                Mathf.Abs(_input.look.y) < NoTurn 
-                    ? 0 
-                    : _input.look.y * RotationSpeed);
-            
-            var smoothX = Mathf.Lerp(t.rotation.eulerAngles.x, t.rotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
-            var smoothY = Mathf.Lerp(t.rotation.eulerAngles.y, t.rotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
-            
-            Quaternion newRotation = new Quaternion();
-            newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
-
-            Debug.Log("NewRot: " + newRotation.eulerAngles);
-            if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
-            {
-                Debug.Log("clamp up");
-                newRotation.eulerAngles = new Vector3(
-                    MinMaxXRotation.x,
-                    smoothY,
-                    0);
-            }
-            else
-            if (newRotation.eulerAngles.x is >= 0 and < 90)
-            {
-                Debug.Log("clamp down");
-                newRotation.eulerAngles = new Vector3(
-                    Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
-                    smoothY,
-                    0);
-            }
-            Debug.Log(newRotation.eulerAngles);
-            transform.rotation = newRotation;
             
             if (_input.move != Vector2.zero)
             {
-                inputDirection = t.right * _input.move.x + t.forward * _input.move.y;
+                _cachedInputDirection = t.right * _input.move.x + t.forward * _input.move.y;
             }
             
-            _controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            
+            _controller.Move(_cachedInputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
         }
 
         private void JumpAndGravity()
