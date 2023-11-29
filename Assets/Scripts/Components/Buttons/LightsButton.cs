@@ -7,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 public class LightsButton : MonoBehaviour, IInteractable
 {
     public GameObject ButtonAudioSource;
+    public GameObject ButtonSpotlight;
     public List<GameObject> Spotlights;
     public float TimeGap = 1f;
     public float StartDelay = 1f;
@@ -60,6 +61,8 @@ public class LightsButton : MonoBehaviour, IInteractable
             }
         }
         
+        gameObject.SetActive(false);
+        ButtonSpotlight.SetActive(false);
         _routineDone = true;
     }
 }
