@@ -6,17 +6,22 @@ using UnityEngine.Rendering.Universal;
 
 public class LightsButton : MonoBehaviour, IInteractable
 {
+    public GameObject ButtonAudioSource;
     public List<GameObject> Spotlights;
     public float TimeGap = 1f;
+    public float StartDelay = 1f;
 
     private float _currentTimeGap;
     private int _spotLightIndex;
     private bool _enabled;
     private bool _routineDone = true;
+    private float _currentStartDelay;
         
     public void Interact()
     {
-        print("TEST");
+        if (ButtonAudioSource != null)
+            ButtonAudioSource.SetActive(true);
+        
         if (!_routineDone)
             return;
         
@@ -30,10 +35,17 @@ public class LightsButton : MonoBehaviour, IInteractable
     private IEnumerator EnableAllLightsRoutine()
     {
         _spotLightIndex = 0;
+        _currentStartDelay = StartDelay;
         _routineDone = false;
         
         while (_spotLightIndex >= 0 && _spotLightIndex != Spotlights.Count)
         {
+            if (_currentStartDelay > 0f)
+            {
+                _currentStartDelay -= Time.deltaTime;
+                yield return null;
+            }
+            else
             if (_currentTimeGap > 0f)
             {
                 _currentTimeGap -= Time.deltaTime;
