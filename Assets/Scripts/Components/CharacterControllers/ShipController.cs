@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using StarterAssets;
 using Unity.VisualScripting;
 using UnityEngine.VFX;
@@ -87,6 +88,8 @@ using UnityEngine.InputSystem;
         public VisualEffect nitroEffect;
 
         public AudioSource nitroSound;
+        
+        public AudioSource flightSound;
 
         // [Tooltip("How far in degrees can you move the camera up")]
         // public float TopClamp = 70.0f;
@@ -186,16 +189,23 @@ using UnityEngine.InputSystem;
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
             _nitroTimeoutDelta = 0;
-            nitroSound.Play(0);
         }
-
-        private bool nitroEffectIsPlaying = false;
         
         private void Update()
         {
             //JumpAndGravity();
             //GroundedCheck();
             Move();
+
+            if (_input.move != Vector2.zero)
+            {
+                if (!flightSound.isPlaying)
+                {
+                    flightSound.Play(0);
+                    StartCoroutine(FadeAudioSource.StartFade(flightSound, 0.5f, 1));
+                }
+            }
+
             if (_input.sprint && _nitroTimeoutDelta <= 0.0f)
             {
                 nitroEffect.Play();
@@ -210,10 +220,20 @@ using UnityEngine.InputSystem;
                 _nitroTimeoutDelta -= Time.deltaTime;
             }
 
+            if (_input.move == Vector2.zero)
+            {
+                StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.5f, 0), flightSound.Stop));
+            }
             if (!_input.sprint)
             {
                 nitroSound.Stop();
             }
+        }
+        
+        private IEnumerator SecondTask(IEnumerator first, Action action) 
+        {
+            yield return StartCoroutine(first);
+            action();
         }
 
         private void LateUpdate()
