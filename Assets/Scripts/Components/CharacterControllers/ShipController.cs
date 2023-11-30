@@ -191,6 +191,7 @@ using UnityEngine.InputSystem;
             _nitroTimeoutDelta = 0;
         }
         
+        
         private void Update()
         {
             //JumpAndGravity();
@@ -202,7 +203,7 @@ using UnityEngine.InputSystem;
                 if (!flightSound.isPlaying)
                 {
                     flightSound.Play(0);
-                    StartCoroutine(FadeAudioSource.StartFade(flightSound, 0.5f, 1));
+                    StartCoroutine(FadeAudioSource.StartFade(flightSound, 0.3f, 1));
                 }
             }
 
@@ -211,6 +212,7 @@ using UnityEngine.InputSystem;
                 nitroEffect.Play();
                 if (!nitroSound.isPlaying)
                 {
+                    nitroSound.volume = 1;
                     nitroSound.Play(0);
                 }
                 _nitroTimeoutDelta = NitroTimeout;
@@ -222,11 +224,12 @@ using UnityEngine.InputSystem;
 
             if (_input.move == Vector2.zero)
             {
-                StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.5f, 0), flightSound.Stop));
+                StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.3f, 0), flightSound.Stop));
             }
             if (!_input.sprint)
             {
                 nitroSound.Stop();
+                //StartCoroutine(SecondTask(FadeAudioSource.StartFade(nitroSound, 0.5f, 0), nitroSound.Stop));
             }
         }
         

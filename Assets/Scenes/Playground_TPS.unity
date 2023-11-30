@@ -692,7 +692,7 @@ GameObject:
   - component: {fileID: 600911527}
   - component: {fileID: 600911528}
   m_Layer: 0
-  m_Name: NotroSound
+  m_Name: NitroSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -720,10 +720,10 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 600911526}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: db7d5c89cbd7b5447a3639735a49380e, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 905b45db97c88fd4da2c21d724e8b46f, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
