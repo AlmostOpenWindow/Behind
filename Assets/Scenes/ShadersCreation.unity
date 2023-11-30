@@ -492,8 +492,8 @@ VisualEffect:
   m_GameObject: {fileID: 2140102285}
   m_Enabled: 1
   m_Asset: {fileID: 8926484042661614526, guid: 1a7c805bf6eab8b438b234c0d3972d3a, type: 3}
-  m_InitialEventName: OnPlay
-  m_InitialEventNameOverriden: 0
+  m_InitialEventName: 
+  m_InitialEventNameOverriden: 1
   m_StartSeed: 0
   m_ResetSeedOnPlay: 1
   m_AllowInstancing: 1
