@@ -1,5 +1,7 @@
 using System;
 using StarterAssets;
+using Unity.VisualScripting;
+using UnityEngine.VFX;
 
 namespace Components.CharacterControllers
 {
@@ -25,7 +27,7 @@ using UnityEngine.InputSystem;
         public float MoveSpeed = 2.0f;
 
         [Tooltip("Sprint speed of the character in m/s")]
-        public float SprintSpeed = 5.335f;
+        public float SprintSpeed = 20.335f;
 
         [Tooltip("How fast the character turns to face movement direction")]
         public float RotationSmoothTime = 1f;
@@ -58,6 +60,9 @@ using UnityEngine.InputSystem;
 
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
+        
+        [Tooltip("Time required to pass before entering the nitro state")]
+        public float NitroTimeout = 0.15f;
 
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -75,6 +80,11 @@ using UnityEngine.InputSystem;
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
+        
+        [Tooltip("Эффект нитро")]
+        public VisualEffect nitroEffect;
+
+        public AudioSource nitroSound;
 
         // [Tooltip("How far in degrees can you move the camera up")]
         // public float TopClamp = 70.0f;
@@ -103,6 +113,7 @@ using UnityEngine.InputSystem;
         private float _terminalVelocity = 53.0f;
 
         // timeout deltatime
+        private float _nitroTimeoutDelta;
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
 
@@ -165,13 +176,35 @@ using UnityEngine.InputSystem;
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+            _nitroTimeoutDelta = 0;
+            nitroSound.Play(0);
         }
 
+        private bool nitroEffectIsPlaying = false;
+        
         private void Update()
         {
             //JumpAndGravity();
             //GroundedCheck();
             Move();
+            if (_input.sprint && _nitroTimeoutDelta <= 0.0f)
+            {
+                nitroEffect.Play();
+                if (!nitroSound.isPlaying)
+                {
+                    nitroSound.Play(0);
+                }
+                _nitroTimeoutDelta = NitroTimeout;
+            }
+            if (_nitroTimeoutDelta >= 0.0f)
+            {
+                _nitroTimeoutDelta -= Time.deltaTime;
+            }
+
+            if (!_input.sprint)
+            {
+                nitroSound.Stop();
+            }
         }
 
         private void LateUpdate()
