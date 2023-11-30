@@ -212,7 +212,6 @@ using UnityEngine.InputSystem;
                 nitroEffect.Play();
                 if (!nitroSound.isPlaying)
                 {
-                    nitroSound.volume = 1;
                     nitroSound.Play(0);
                 }
                 _nitroTimeoutDelta = NitroTimeout;
