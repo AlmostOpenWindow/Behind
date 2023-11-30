@@ -45,6 +45,8 @@ using UnityEngine.InputSystem;
 
         [Header("Animations")] 
         public Animator ArmatureAnimator;
+
+        public float SpeedXAnimValueLerpTime = 1f;
         
         [Header("Gravity & Ground")]
         [Space(10)]
@@ -106,7 +108,11 @@ using UnityEngine.InputSystem;
 
         // player
         public float _speed;
-        private float _animationBlend;
+        private float _animationBlendX;
+        private float _animationBlendZ;
+        private float _animationBlendLerpedX;
+        private float _animationBlendLerpedZ;
+        
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
         private float _verticalVelocity;
@@ -118,11 +124,14 @@ using UnityEngine.InputSystem;
         private float _fallTimeoutDelta;
 
         // animation IDs
-        private int _animIDSpeed;
-        private int _animIDGrounded;
-        private int _animIDJump;
-        private int _animIDFreeFall;
-        private int _animIDMotionSpeed;
+        private int _animSpeedX;
+        private int _animSpeedZ;
+        
+        // private int _animIDSpeed;
+        // private int _animIDGrounded;
+        // private int _animIDJump;
+        // private int _animIDFreeFall;
+        // private int _animIDMotionSpeed;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -214,11 +223,14 @@ using UnityEngine.InputSystem;
 
         private void AssignAnimationIDs()
         {
-            _animIDSpeed = Animator.StringToHash("Speed");
-            _animIDGrounded = Animator.StringToHash("Grounded");
-            _animIDJump = Animator.StringToHash("Jump");
-            _animIDFreeFall = Animator.StringToHash("FreeFall");
-            _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+            _animSpeedX = Animator.StringToHash("SpeedX");
+            _animSpeedZ = Animator.StringToHash("SpeedZ");
+            
+            //_animIDSpeed = Animator.StringToHash("Speed");
+            // _animIDGrounded = Animator.StringToHash("Grounded");
+            // _animIDJump = Animator.StringToHash("Jump");
+            // _animIDFreeFall = Animator.StringToHash("FreeFall");
+            // _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
         }
 
         // private void GroundedCheck()
@@ -253,11 +265,9 @@ using UnityEngine.InputSystem;
             
             Quaternion newRotation = new Quaternion();
             newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
-
-            Debug.Log("NewRot: " + newRotation.eulerAngles);
+            
             if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
             {
-                Debug.Log("clamp up");
                 newRotation.eulerAngles = new Vector3(
                     MinMaxXRotation.x,
                     smoothY,
@@ -266,13 +276,11 @@ using UnityEngine.InputSystem;
             else
             if (newRotation.eulerAngles.x is >= 0 and < 90)
             {
-                Debug.Log("clamp down");
                 newRotation.eulerAngles = new Vector3(
                     Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
                     smoothY,
                     0);
             }
-            Debug.Log(newRotation.eulerAngles);
             transform.rotation = newRotation;
         }
         // private void Rotation()
@@ -332,6 +340,7 @@ using UnityEngine.InputSystem;
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            var targetAnimationSpeed = targetSpeed;
             var speedAcceleration = SpeedAcceleration;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
@@ -369,17 +378,31 @@ using UnityEngine.InputSystem;
                 _speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * speedAcceleration);
-            if (_animationBlend < 0.01f) _animationBlend = 0f;
-            
-            FPMove(); 
+            FPMove();
             //TPMove();
             
             // update animator if using character
+            
+            var velocity = _controller.velocity;
+            var localVelocity = transform.InverseTransformDirection(velocity);
+            Debug.Log("LocalVelocity: " + localVelocity);
+            
+            _animationBlendX = localVelocity.x / targetAnimationSpeed;
+            _animationBlendZ = localVelocity.z / targetAnimationSpeed;
+            Debug.Log("AnimBlend: " + _animationBlendX);
+            
+            if (_animationBlendX < 0.01f && _animationBlendX > 0.01f) _animationBlendX = 0f;
+            if (_animationBlendZ < 0.01f && _animationBlendZ > 0.01f) _animationBlendZ = 0f;
+            
             if (_hasAnimator)
             {
-                ArmatureAnimator.SetFloat(_animIDSpeed, _animationBlend);
-                ArmatureAnimator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                Debug.Log("Blend: " + _animationBlendX);
+                Debug.Log("SIGN: " + Math.Sign(localVelocity.x));
+                _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
+                    Time.deltaTime * SpeedXAnimValueLerpTime);
+                var speedXValue = _animationBlendLerpedX;
+        
+                ArmatureAnimator.SetFloat(_animSpeedX, speedXValue);
             }
         }
 
@@ -429,11 +452,11 @@ using UnityEngine.InputSystem;
                 _fallTimeoutDelta = FallTimeout;
 
                 // update animator if using character
-                if (_hasAnimator)
-                {
-                    ArmatureAnimator.SetBool(_animIDJump, false);
-                    ArmatureAnimator.SetBool(_animIDFreeFall, false);
-                }
+                // if (_hasAnimator)
+                // {
+                //     ArmatureAnimator.SetBool(_animIDJump, false);
+                //     ArmatureAnimator.SetBool(_animIDFreeFall, false);
+                // }
 
                 // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
@@ -448,10 +471,10 @@ using UnityEngine.InputSystem;
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        ArmatureAnimator.SetBool(_animIDJump, true);
-                    }
+                    // if (_hasAnimator)
+                    // {
+                    //     ArmatureAnimator.SetBool(_animIDJump, true);
+                    // }
                 }
 
                 // jump timeout
@@ -473,10 +496,10 @@ using UnityEngine.InputSystem;
                 else
                 {
                     // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        ArmatureAnimator.SetBool(_animIDFreeFall, true);
-                    }
+                    // if (_hasAnimator)
+                    // {
+                    //     ArmatureAnimator.SetBool(_animIDFreeFall, true);
+                    // }
                 }
 
                 // if we are not grounded, do not jump
