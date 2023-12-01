@@ -4624,13 +4624,17 @@ MonoBehaviour:
   MinMaxXRotation: {x: -30, y: 65}
   MoveSpeed: 8
   SprintSpeed: 30
-  RotationSmoothTime: 10
+  RotationSmoothTime: 0.2
   SpeedAcceleration: 10
   SpeedDeceleration: 3.4
   RotationSpeed: 100
   NoTurn: 0.01
   ArmatureAnimator: {fileID: 2077693800}
   SpeedXAnimValueLerpTime: 5
+  ShipModel: {fileID: 0}
+  MinMaxShipModelRotationX: {x: 0, y: 0}
+  MinMaxShipModelRotationY: {x: 0, y: 0}
+  ShipModelRotationSpeed: 10
   JumpHeight: 1.2
   Gravity: -15
   JumpTimeout: 0.5
@@ -4652,6 +4656,11 @@ MonoBehaviour:
   - {fileID: 2074578222}
   nitroSound: {fileID: 600911528}
   flightSound: {fileID: 1054855335}
+  TopClamp: 70
+  BottomClamp: -30
+  CameraAngleOverride: 0
+  LockCameraPosition: 0
+  DoCameraClamp: 1
   _speed: 0
 --- !u!114 &1582653250
 MonoBehaviour:
@@ -4742,6 +4751,7 @@ MonoBehaviour:
   look: {x: 0, y: 0}
   jump: 0
   sprint: 0
+  lockRotation: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -10472,6 +10482,7 @@ MonoBehaviour:
   look: {x: 0, y: 0}
   jump: 0
   sprint: 0
+  lockRotation: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
