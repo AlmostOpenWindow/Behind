@@ -2,6 +2,7 @@ using System;
 using StarterAssets;
 using Unity.VisualScripting;
 using UnityEngine.VFX;
+using Utils;
 
 namespace Components.CharacterControllers
 {
@@ -47,6 +48,14 @@ using UnityEngine.InputSystem;
         public Animator ArmatureAnimator;
 
         public float SpeedXAnimValueLerpTime = 1f;
+
+        public GameObject ShipModel;
+
+        public Vector2 MinMaxShipModelRotationX;
+
+        public Vector2 MinMaxShipModelRotationY;
+
+        public float ShipModelRotationSpeed = 10f;
         
         [Header("Gravity & Ground")]
         [Space(10)]
@@ -88,19 +97,19 @@ using UnityEngine.InputSystem;
 
         public AudioSource nitroSound;
 
-        // [Tooltip("How far in degrees can you move the camera up")]
-        // public float TopClamp = 70.0f;
-        //
-        // [Tooltip("How far in degrees can you move the camera down")]
-        // public float BottomClamp = -30.0f;
-        //
-        // [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
-        // public float CameraAngleOverride = 0.0f;
-        //
-        // [Tooltip("For locking the camera position on all axis")]
-        // public bool LockCameraPosition = false;
-        //
-        // public bool DoCameraClamp = true;
+        [Tooltip("How far in degrees can you move the camera up")]
+        public float TopClamp = 70.0f;
+        
+        [Tooltip("How far in degrees can you move the camera down")]
+        public float BottomClamp = -30.0f;
+        
+        [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
+        public float CameraAngleOverride = 0.0f;
+        
+        [Tooltip("For locking the camera position on all axis")]
+        public bool LockCameraPosition = false;
+        
+        public bool DoCameraClamp = true;
         
         // cinemachine
         private float _cinemachineTargetYaw;
@@ -113,8 +122,7 @@ using UnityEngine.InputSystem;
         private float _animationBlendLerpedX;
         private float _animationBlendLerpedZ;
         
-        private float _targetRotation = 0.0f;
-        private float _rotationVelocity;
+        private Vector4 _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
 
@@ -250,68 +258,172 @@ using UnityEngine.InputSystem;
 
         private void Rotation()
         {
-            var t = transform;
+            if (!_input.lockRotation)
+            {
+                //Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+                if (_input.move != Vector2.zero)
+                {
+                    Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+                    var forward = transform.forward;
+
+                    var mainCamEulerAngles = _mainCamera.transform.eulerAngles;
+                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, _mainCamera.transform.rotation, ref _rotationVelocity,
+                        RotationSmoothTime);
+                    // Debug.Log("CamAngles: " + mainCamEulerAngles );
+                    //
+                    //
+                    // float rotationX =  Mathf.Lerp(transform.eulerAngles.x, mainCamEulerAngles.x, Time.deltaTime * RotationSmoothTime);
+                    //
+                    // float rotationY = Mathf.Lerp(transform.eulerAngles.y, mainCamEulerAngles.y, Time.deltaTime * RotationSmoothTime);
+                    // // float rotationX =  Mathf.SmoothDampAngle(transform.eulerAngles.x, mainCamEulerAngles.x, ref _rotationVelocity,
+                    // //     RotationSmoothTime);
+                    // //
+                    // // float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y, mainCamEulerAngles.y, ref _rotationVelocity,
+                    // //     RotationSmoothTime);
+                    //
+                    // Debug.Log("SmoothRot: " + new Vector2(rotationX, rotationY));
+                    // //Debug.Log("TargetRot: " + new Vector2(targetRotationX, targetRotationY) + "\nRotationEuler: " + new Vector2(rotationX, rotationY));
+                    // // rotate to face input direction relative to camera position
+                    // transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
+                }
+            }
+            
+            // var t = transform;
+            // var delta = new Vector2(
+            //     Mathf.Abs(_input.look.x) < NoTurn 
+            //         ? 0 
+            //         : _input.look.x * RotationSpeed, 
+            //     Mathf.Abs(_input.look.y) < NoTurn 
+            //         ? 0 
+            //         : _input.look.y * RotationSpeed);
+            //
+            // var tRotation = t.rotation;
+            // var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
+            // var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
+            //
+            // Quaternion newRotation = new Quaternion();
+            // newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
+            //
+            // if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
+            // {
+            //     newRotation.eulerAngles = new Vector3(
+            //         MinMaxXRotation.x,
+            //         smoothY,
+            //         0);
+            // }
+            // else
+            // if (newRotation.eulerAngles.x is >= 0 and < 90)
+            // {
+            //     newRotation.eulerAngles = new Vector3(
+            //         Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
+            //         smoothY,
+            //         0);
+            // }
+            // transform.rotation = newRotation;
+            //if (!_input.lockRotation)
+            //    RotationToLook(transform, RotationSpeed, MinMaxXRotation, null, true);
+            TPCameraRotation();
+            //RotateShipModel();
+            //RotateShipModel();
+        }
+
+        private void RotationToLook(Transform rotatable, float rotationSpeed, Vector2? minMaxAnglesX, Vector2? minMaxAnglesY, bool freezeZ)
+        {
+            var t = rotatable;
             var delta = new Vector2(
                 Mathf.Abs(_input.look.x) < NoTurn 
                     ? 0 
-                    : _input.look.x * RotationSpeed, 
+                    : _input.look.x * rotationSpeed, 
                 Mathf.Abs(_input.look.y) < NoTurn 
                     ? 0 
-                    : _input.look.y * RotationSpeed);
+                    : _input.look.y * rotationSpeed);
 
-            var tRotation = t.rotation;
+            var tRotation = t.localRotation;
             var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
             var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
             
-            Quaternion newRotation = new Quaternion();
-            newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
+            var newRotation = new Quaternion
+            {
+                eulerAngles = new Vector3(smoothX, smoothY, 0)
+            };
             
-            if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
+            SetMinMaxAngles(ref newRotation, new Vector2(smoothX, smoothY), minMaxAnglesX, minMaxAnglesY, freezeZ);
+            rotatable.localRotation = newRotation;
+        }
+
+        private void SetMinMaxAngles(ref Quaternion rotation, Vector2 smoothXY, Vector2? minMaxAnglesX, Vector2? minMaxAnglesY, bool freezeZ)
+        {
+            if (minMaxAnglesX.HasValue)
             {
-                newRotation.eulerAngles = new Vector3(
-                    MinMaxXRotation.x,
-                    smoothY,
-                    0);
+                if (rotation.eulerAngles.x > 90 && rotation.eulerAngles.x < minMaxAnglesX.Value.x + 360)
+                {
+                    rotation.eulerAngles = new Vector3(
+                        minMaxAnglesX.Value.x,
+                        smoothXY.y,
+                        freezeZ ? 0.0f : rotation.eulerAngles.z);
+                }
+                else
+                if (rotation.eulerAngles.x is >= 0 and < 90)
+                {
+                    rotation.eulerAngles = new Vector3(
+                        Mathf.Clamp(rotation.eulerAngles.x, 0, minMaxAnglesX.Value.y),
+                        smoothXY.y,
+                        freezeZ ? 0.0f : rotation.eulerAngles.z);
+                }
             }
-            else
-            if (newRotation.eulerAngles.x is >= 0 and < 90)
+            
+            if (minMaxAnglesY.HasValue)
             {
-                newRotation.eulerAngles = new Vector3(
-                    Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
-                    smoothY,
-                    0);
+                if (rotation.eulerAngles.y > 90 && rotation.eulerAngles.y < minMaxAnglesY.Value.x + 360)
+                {
+                    rotation.eulerAngles = new Vector3(
+                        smoothXY.x,
+                        minMaxAnglesY.Value.x,
+                        freezeZ ? 0.0f : rotation.eulerAngles.z);
+                }
+                else if (rotation.eulerAngles.y is >= 0 and < 90)
+                {
+                    rotation.eulerAngles = new Vector3(
+                        smoothXY.x,
+                        Mathf.Clamp(rotation.eulerAngles.y, 0, minMaxAnglesY.Value.y),
+                        freezeZ ? 0.0f : rotation.eulerAngles.z);
+                }
             }
-            transform.rotation = newRotation;
+        }
+        
+        private void RotateShipModel()
+        {
+           RotationToLook(ShipModel.transform, ShipModelRotationSpeed, MinMaxShipModelRotationX, MinMaxShipModelRotationY, true);
         }
         // private void Rotation()
         // {
         //     FPRotation();
         // }
         
-        // private void TPCameraRotation()
-        // {
-        //     // if there is an input and camera position is not fixed
-        //     if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
-        //     {
-        //         //Don't multiply mouse input by Time.deltaTime;
-        //         float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-        //
-        //         _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
-        //         _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
-        //     }
-        //
-        //     // clamp our rotations so our values are limited 360 degrees
-        //     _cinemachineTargetYaw = DoCameraClamp
-        //         ? ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue)
-        //         : Clamp360(_cinemachineTargetYaw);
-        //     _cinemachineTargetPitch = DoCameraClamp
-        //         ? ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp)
-        //         : Clamp360(_cinemachineTargetPitch);
-        //
-        //     // Cinemachine will follow this target
-        //     CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
-        //         _cinemachineTargetYaw, 0.0f);
-        // }
+        private void TPCameraRotation()
+        {
+            // if there is an input and camera position is not fixed
+            if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            {
+                //Don't multiply mouse input by Time.deltaTime;
+                float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
+        
+                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
+                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+            }
+        
+            // clamp our rotations so our values are limited 360 degrees
+            _cinemachineTargetYaw = DoCameraClamp
+                ? ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue)
+                : Clamp360(_cinemachineTargetYaw);
+            _cinemachineTargetPitch = DoCameraClamp
+                ? ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp)
+                : Clamp360(_cinemachineTargetPitch);
+        
+            // Cinemachine will follow this target
+            CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
+                _cinemachineTargetYaw, 0.0f);
+        }
 
         // private void FPRotation()
         // {
@@ -385,19 +497,19 @@ using UnityEngine.InputSystem;
             
             var velocity = _controller.velocity;
             var localVelocity = transform.InverseTransformDirection(velocity);
-            Debug.Log("LocalVelocity: " + localVelocity);
+            //Debug.Log("LocalVelocity: " + localVelocity);
             
             _animationBlendX = localVelocity.x / targetAnimationSpeed;
             _animationBlendZ = localVelocity.z / targetAnimationSpeed;
-            Debug.Log("AnimBlend: " + _animationBlendX);
+            //Debug.Log("AnimBlend: " + _animationBlendX);
             
             if (_animationBlendX < 0.01f && _animationBlendX > 0.01f) _animationBlendX = 0f;
             if (_animationBlendZ < 0.01f && _animationBlendZ > 0.01f) _animationBlendZ = 0f;
             
             if (_hasAnimator)
             {
-                Debug.Log("Blend: " + _animationBlendX);
-                Debug.Log("SIGN: " + Math.Sign(localVelocity.x));
+                //Debug.Log("Blend: " + _animationBlendX);
+                //Debug.Log("SIGN: " + Math.Sign(localVelocity.x));
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
                 var speedXValue = _animationBlendLerpedX;

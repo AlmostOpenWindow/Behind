@@ -28,6 +28,7 @@ namespace StarterAssets
             starterAssetsInputs.SprintInput(virtualSprintState);
         }
         
+        //TODO virtual input for LockRotation
     }
 
 }

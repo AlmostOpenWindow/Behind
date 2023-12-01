@@ -12,6 +12,7 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public bool lockRotation;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -32,6 +33,11 @@ namespace StarterAssets
 			{
 				LookInput(value.Get<Vector2>());
 			}
+		}
+
+		public void OnLockRotation(InputValue value)
+		{
+			LockRotationInput(value.isPressed);
 		}
 
 		public void OnJump(InputValue value)
@@ -64,6 +70,11 @@ namespace StarterAssets
 		public void SprintInput(bool newSprintState)
 		{
 			sprint = newSprintState;
+		}
+
+		public void LockRotationInput(bool lockRotationState)
+		{
+			lockRotation = lockRotationState;
 		}
 		
 		private void OnApplicationFocus(bool hasFocus)
