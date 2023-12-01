@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -7,10 +8,13 @@ namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
+		public event Action clickFEvent; 
+		
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
 		public bool jump;
+		public bool flashlight;
 		public bool sprint;
 		public bool lockRotation;
 
@@ -49,6 +53,12 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
+		
+		public void OnFlashlight(InputValue value)
+		{
+			clickFEvent?.Invoke();
+			FlashlightInput(value.isPressed);
+		}
 #endif
 
 
@@ -65,6 +75,11 @@ namespace StarterAssets
 		public void JumpInput(bool newJumpState)
 		{
 			jump = newJumpState;
+		}
+		
+		public void FlashlightInput(bool newFlashlightState)
+		{
+			flashlight = newFlashlightState;
 		}
 
 		public void SprintInput(bool newSprintState)

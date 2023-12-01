@@ -7,9 +7,9 @@ using Utils;
 
 namespace Components.CharacterControllers
 {
-     using UnityEngine;
-#if ENABLE_INPUT_SYSTEM 
-using UnityEngine.InputSystem;
+    using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+    using UnityEngine.InputSystem;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -21,10 +21,9 @@ using UnityEngine.InputSystem;
 // #endif
     public class ShipController : MonoBehaviour
     {
-        [Header("Player")] 
-        [Tooltip("Чтобы не переворачивался в мертвую петлю")]
+        [Header("Player")] [Tooltip("Чтобы не переворачивался в мертвую петлю")]
         public Vector2 MinMaxXRotation;
-        
+
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
 
@@ -33,20 +32,18 @@ using UnityEngine.InputSystem;
 
         [Tooltip("How fast the character turns to face movement direction")]
         public float RotationSmoothTime = 1f;
-        
+
         [Header("Acceleration and deceleration")]
         public float SpeedAcceleration = 10.0f;
 
         public float SpeedDeceleration = 5.0f;
-        
-        [Header("Movement for FirstPerson View")]
-        [Tooltip("Rotation speed of the character")]
+
+        [Header("Movement for FirstPerson View")] [Tooltip("Rotation speed of the character")]
         public float RotationSpeed = 1.0f;
 
         public float NoTurn = 0.01f;
 
-        [Header("Animations")] 
-        public Animator ArmatureAnimator;
+        [Header("Animations")] public Animator ArmatureAnimator;
 
         public float SpeedXAnimValueLerpTime = 1f;
 
@@ -57,10 +54,8 @@ using UnityEngine.InputSystem;
         public Vector2 MinMaxShipModelRotationY;
 
         public float ShipModelRotationSpeed = 10f;
-        
-        [Header("Gravity & Ground")]
-        [Space(10)]
-        [Tooltip("The height the player can jump")]
+
+        [Header("Gravity & Ground")] [Space(10)] [Tooltip("The height the player can jump")]
         public float JumpHeight = 1.2f;
 
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
@@ -72,7 +67,7 @@ using UnityEngine.InputSystem;
 
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
-        
+
         [Tooltip("Time required to pass before entering the nitro state")]
         public float NitroTimeout = 0.15f;
 
@@ -80,8 +75,7 @@ using UnityEngine.InputSystem;
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
 
-        [Tooltip("Useful for rough ground")]
-        public float GroundedOffset = -0.14f;
+        [Tooltip("Useful for rough ground")] public float GroundedOffset = -0.14f;
 
         [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
         public float GroundedRadius = 0.28f;
@@ -92,34 +86,31 @@ using UnityEngine.InputSystem;
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
-        
-        [Tooltip("Эффект нитро")]
-        public VisualEffect nitroEffect;
-        
-        [Tooltip("Эффект задних двигателей")]
-        public List<VisualEffect> backEnginesEffect;
-        
-        [Tooltip("Эффект боковых двигателей")]
-        public List<VisualEffect> sideEnginesEffect;
+
+        [Tooltip("Эффект нитро")] public VisualEffect nitroEffect;
+
+        [Tooltip("Эффект задних двигателей")] public List<VisualEffect> backEnginesEffect;
+
+        [Tooltip("Эффект боковых двигателей")] public List<VisualEffect> sideEnginesEffect;
 
         public AudioSource nitroSound;
-        
+
         public AudioSource flightSound;
 
         [Tooltip("How far in degrees can you move the camera up")]
         public float TopClamp = 70.0f;
-        
+
         [Tooltip("How far in degrees can you move the camera down")]
         public float BottomClamp = -30.0f;
-        
+
         [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
         public float CameraAngleOverride = 0.0f;
-        
+
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
-        
+
         public bool DoCameraClamp = true;
-        
+
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -130,7 +121,7 @@ using UnityEngine.InputSystem;
         private float _animationBlendZ;
         private float _animationBlendLerpedX;
         private float _animationBlendLerpedZ;
-        
+
         private Vector4 _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
@@ -143,14 +134,14 @@ using UnityEngine.InputSystem;
         // animation IDs
         private int _animSpeedX;
         private int _animSpeedZ;
-        
+
         // private int _animIDSpeed;
         // private int _animIDGrounded;
         // private int _animIDJump;
         // private int _animIDFreeFall;
         // private int _animIDMotionSpeed;
 
-#if ENABLE_INPUT_SYSTEM 
+#if ENABLE_INPUT_SYSTEM
         private PlayerInput _playerInput;
 #endif
         private CharacterController _controller;
@@ -161,7 +152,7 @@ using UnityEngine.InputSystem;
 
         private bool _hasAnimator;
         private Vector3 _cachedInputDirection;
-        
+
         private bool IsCurrentDeviceMouse
         {
             get
@@ -193,7 +184,7 @@ using UnityEngine.InputSystem;
             _controller = GetComponent<CharacterController>();
             var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
             _input = inputObject.GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM 
+#if ENABLE_INPUT_SYSTEM
             _playerInput = inputObject.GetComponent<PlayerInput>();
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
@@ -206,8 +197,8 @@ using UnityEngine.InputSystem;
             _fallTimeoutDelta = FallTimeout;
             _nitroTimeoutDelta = 0;
         }
-        
-        
+
+
         private void Update()
         {
             //JumpAndGravity();
@@ -235,8 +226,10 @@ using UnityEngine.InputSystem;
                 {
                     nitroSound.Play(0);
                 }
+
                 _nitroTimeoutDelta = NitroTimeout;
             }
+
             if (_nitroTimeoutDelta >= 0.0f)
             {
                 _nitroTimeoutDelta -= Time.deltaTime;
@@ -248,16 +241,18 @@ using UnityEngine.InputSystem;
                 {
                     visualEffect.enabled = false;
                 }
+
                 StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.3f, 0), flightSound.Stop));
             }
+
             if (!_input.sprint)
             {
                 nitroSound.Stop();
                 //StartCoroutine(SecondTask(FadeAudioSource.StartFade(nitroSound, 0.5f, 0), nitroSound.Stop));
             }
         }
-        
-        private IEnumerator SecondTask(IEnumerator first, Action action) 
+
+        private IEnumerator SecondTask(IEnumerator first, Action action)
         {
             yield return StartCoroutine(first);
             action();
@@ -272,7 +267,7 @@ using UnityEngine.InputSystem;
         {
             _animSpeedX = Animator.StringToHash("SpeedX");
             _animSpeedZ = Animator.StringToHash("SpeedZ");
-            
+
             //_animIDSpeed = Animator.StringToHash("Speed");
             // _animIDGrounded = Animator.StringToHash("Grounded");
             // _animIDJump = Animator.StringToHash("Jump");
@@ -309,8 +304,9 @@ using UnityEngine.InputSystem;
 
                     var desiredRotation = Quaternion.FromToRotation(transform.position,
                         _gameplayCamera.ShipTargetForMovement.position);
-                    
-                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, _gameplayCamera.MainCamera.transform.rotation, ref _rotationVelocity,
+
+                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation,
+                        _gameplayCamera.MainCamera.transform.rotation, ref _rotationVelocity,
                         RotationSmoothTime);
                     // Debug.Log("CamAngles: " + mainCamEulerAngles );
                     //
@@ -330,7 +326,7 @@ using UnityEngine.InputSystem;
                     // transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
                 }
             }
-            
+
             // var t = transform;
             // var delta = new Vector2(
             //     Mathf.Abs(_input.look.x) < NoTurn 
@@ -370,31 +366,35 @@ using UnityEngine.InputSystem;
             //RotateShipModel();
         }
 
-        private void RotationToLook(Transform rotatable, float rotationSpeed, Vector2? minMaxAnglesX, Vector2? minMaxAnglesY, bool freezeZ)
+        private void RotationToLook(Transform rotatable, float rotationSpeed, Vector2? minMaxAnglesX,
+            Vector2? minMaxAnglesY, bool freezeZ)
         {
             var t = rotatable;
             var delta = new Vector2(
-                Mathf.Abs(_input.look.x) < NoTurn 
-                    ? 0 
-                    : _input.look.x * rotationSpeed, 
-                Mathf.Abs(_input.look.y) < NoTurn 
-                    ? 0 
+                Mathf.Abs(_input.look.x) < NoTurn
+                    ? 0
+                    : _input.look.x * rotationSpeed,
+                Mathf.Abs(_input.look.y) < NoTurn
+                    ? 0
                     : _input.look.y * rotationSpeed);
 
             var tRotation = t.localRotation;
-            var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
-            var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
-            
+            var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y,
+                Time.deltaTime * RotationSmoothTime);
+            var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x,
+                Time.deltaTime * RotationSmoothTime);
+
             var newRotation = new Quaternion
             {
                 eulerAngles = new Vector3(smoothX, smoothY, 0)
             };
-            
+
             SetMinMaxAngles(ref newRotation, new Vector2(smoothX, smoothY), minMaxAnglesX, minMaxAnglesY, freezeZ);
             rotatable.localRotation = newRotation;
         }
 
-        private void SetMinMaxAngles(ref Quaternion rotation, Vector2 smoothXY, Vector2? minMaxAnglesX, Vector2? minMaxAnglesY, bool freezeZ)
+        private void SetMinMaxAngles(ref Quaternion rotation, Vector2 smoothXY, Vector2? minMaxAnglesX,
+            Vector2? minMaxAnglesY, bool freezeZ)
         {
             if (minMaxAnglesX.HasValue)
             {
@@ -405,8 +405,7 @@ using UnityEngine.InputSystem;
                         smoothXY.y,
                         freezeZ ? 0.0f : rotation.eulerAngles.z);
                 }
-                else
-                if (rotation.eulerAngles.x is >= 0 and < 90)
+                else if (rotation.eulerAngles.x is >= 0 and < 90)
                 {
                     rotation.eulerAngles = new Vector3(
                         Mathf.Clamp(rotation.eulerAngles.x, 0, minMaxAnglesX.Value.y),
@@ -414,7 +413,7 @@ using UnityEngine.InputSystem;
                         freezeZ ? 0.0f : rotation.eulerAngles.z);
                 }
             }
-            
+
             if (minMaxAnglesY.HasValue)
             {
                 if (rotation.eulerAngles.y > 90 && rotation.eulerAngles.y < minMaxAnglesY.Value.x + 360)
@@ -433,16 +432,17 @@ using UnityEngine.InputSystem;
                 }
             }
         }
-        
+
         private void RotateShipModel()
         {
-           RotationToLook(ShipModel.transform, ShipModelRotationSpeed, MinMaxShipModelRotationX, MinMaxShipModelRotationY, true);
+            RotationToLook(ShipModel.transform, ShipModelRotationSpeed, MinMaxShipModelRotationX,
+                MinMaxShipModelRotationY, true);
         }
         // private void Rotation()
         // {
         //     FPRotation();
         // }
-        
+
         private void TPCameraRotation()
         {
             // if there is an input and camera position is not fixed
@@ -450,11 +450,11 @@ using UnityEngine.InputSystem;
             {
                 //Don't multiply mouse input by Time.deltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-        
+
                 _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
                 _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
             }
-        
+
             // clamp our rotations so our values are limited 360 degrees
             _cinemachineTargetYaw = DoCameraClamp
                 ? ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue)
@@ -462,7 +462,7 @@ using UnityEngine.InputSystem;
             _cinemachineTargetPitch = DoCameraClamp
                 ? ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp)
                 : Clamp360(_cinemachineTargetPitch);
-        
+
             // Cinemachine will follow this target
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
@@ -475,7 +475,7 @@ using UnityEngine.InputSystem;
         //     {
         //         //Don't multiply mouse input by Time.deltaTime
         //         float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				    //
+        //
         //         //_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
         //         //_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
         //
@@ -490,7 +490,7 @@ using UnityEngine.InputSystem;
         //         //transform.Rotate(Vector3.up * _rotationVelocity);
         //     }
         // }
-        
+
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
@@ -499,9 +499,9 @@ using UnityEngine.InputSystem;
             var speedAcceleration = SpeedAcceleration;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-            
+
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
-            
+
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
             if (_input.move == Vector2.zero)
@@ -511,11 +511,11 @@ using UnityEngine.InputSystem;
             }
 
             // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = _controller.velocity.magnitude; 
+            float currentHorizontalSpeed = _controller.velocity.magnitude;
             //for only horizontal speed: new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
-            
+
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -535,23 +535,22 @@ using UnityEngine.InputSystem;
 
             FPMove();
             //TPMove();
-            
+
             // update animator if using character
-            
+
             var velocity = _controller.velocity;
             var localVelocity = transform.InverseTransformDirection(velocity);
             //Debug.Log("LocalVelocity: " + localVelocity);
-            
+
             _animationBlendX = localVelocity.x / targetAnimationSpeed;
             _animationBlendZ = localVelocity.z / targetAnimationSpeed;
             //Debug.Log("AnimBlend: " + _animationBlendX);
-            
+
             if (_animationBlendX < 0.01f && _animationBlendX > 0.01f) _animationBlendX = 0f;
             if (_animationBlendZ < 0.01f && _animationBlendZ > 0.01f) _animationBlendZ = 0f;
-            
+
             if (_hasAnimator)
             {
-                Debug.Log("Blend: " + _animationBlendX);
                 var sign = Math.Sign(localVelocity.x);
                 if (_input.move.x < 0)
                 {
@@ -568,12 +567,12 @@ using UnityEngine.InputSystem;
                     sideEnginesEffect[0].enabled = false;
                     sideEnginesEffect[1].enabled = false;
                 }
-                Debug.Log("SIGN: " + sign);
+
                 _animationBlendLerpedZ = Mathf.Lerp(_animationBlendLerpedZ, _animationBlendZ,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
-        
+
                 ArmatureAnimator.SetFloat(_animSpeedX, _animationBlendLerpedX);
                 ArmatureAnimator.SetFloat(_animSpeedZ, _animationBlendLerpedZ);
             }
@@ -603,18 +602,19 @@ using UnityEngine.InputSystem;
         //     _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
         //                      new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
         // }
-        
+
         private void FPMove()
         {
             var t = transform;
-            
+
             if (_input.move != Vector2.zero)
             {
                 _cachedInputDirection = t.right * _input.move.x + t.forward * _input.move.y;
             }
-            
-            
-            _controller.Move(_cachedInputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
+
+            _controller.Move(_cachedInputDirection.normalized * (_speed * Time.deltaTime) +
+                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
         }
 
         private void JumpAndGravity()
@@ -685,7 +685,7 @@ using UnityEngine.InputSystem;
                 _verticalVelocity += Gravity * Time.deltaTime;
             }
         }
-        
+
         private static float Clamp360(float lfAngle)
         {
             if (lfAngle < -360f) lfAngle += 360f;
@@ -693,11 +693,12 @@ using UnityEngine.InputSystem;
 
             return lfAngle;
         }
+
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
             if (lfAngle < -360f) lfAngle += 360f;
             if (lfAngle > 360f) lfAngle -= 360f;
-            
+
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
 
