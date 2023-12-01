@@ -564,11 +564,13 @@ using UnityEngine.InputSystem;
                     sideEnginesEffect[1].enabled = false;
                 }
                 Debug.Log("SIGN: " + sign);
+                _animationBlendLerpedZ = Mathf.Lerp(_animationBlendLerpedZ, _animationBlendZ,
+                    Time.deltaTime * SpeedXAnimValueLerpTime);
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
-                var speedXValue = _animationBlendLerpedX;
         
-                ArmatureAnimator.SetFloat(_animSpeedX, speedXValue);
+                ArmatureAnimator.SetFloat(_animSpeedX, _animationBlendLerpedX);
+                ArmatureAnimator.SetFloat(_animSpeedZ, _animationBlendLerpedZ);
             }
         }
 
