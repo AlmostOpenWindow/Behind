@@ -2943,7 +2943,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1152211236}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
@@ -4494,12 +4494,40 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Range
-      value: 10000
+      value: 100000
       objectReference: {fileID: 0}
     - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Intensity
-      value: 521.99
+      value: 100000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_SpotAngle
+      value: 40.641758
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_RenderMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_InnerSpotAngle
+      value: 24.831467
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_BounceIntensity
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1749423527976620352, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5783383558000648386, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Enabled
@@ -4509,6 +4537,10 @@ PrefabInstance:
       propertyPath: m_audioClip
       value: 
       objectReference: {fileID: 8300000, guid: f5952dd3632624041805dcb37d56f26e, type: 3}
+    - target: {fileID: 6655554088440439311, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Name
       value: VolumetricSpotLight (3)
@@ -4516,6 +4548,26 @@ PrefabInstance:
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7054507279851621225, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7054507279851621225, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: fallOffEnd
+      value: 91.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7054507279851621225, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: fallOffStart
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7054507279851621225, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: intensityInside
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7054507279851621225, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: intensityOutside
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
