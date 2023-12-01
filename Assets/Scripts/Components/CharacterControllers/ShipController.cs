@@ -90,6 +90,9 @@ using UnityEngine.InputSystem;
         
         [Tooltip("Эффект задних двигателей")]
         public List<VisualEffect> backEnginesEffect;
+        
+        [Tooltip("Эффект боковых двигателей")]
+        public List<VisualEffect> sideEnginesEffect;
 
         public AudioSource nitroSound;
         
@@ -432,7 +435,23 @@ using UnityEngine.InputSystem;
             if (_hasAnimator)
             {
                 Debug.Log("Blend: " + _animationBlendX);
-                Debug.Log("SIGN: " + Math.Sign(localVelocity.x));
+                var sign = Math.Sign(localVelocity.x);
+                if (_input.move.x < 0)
+                {
+                    sideEnginesEffect[1].enabled = true;
+                    sideEnginesEffect[0].enabled = false;
+                }
+                else if (_input.move.x > 0)
+                {
+                    sideEnginesEffect[1].enabled = false;
+                    sideEnginesEffect[0].enabled = true;
+                }
+                else
+                {
+                    sideEnginesEffect[0].enabled = false;
+                    sideEnginesEffect[1].enabled = false;
+                }
+                Debug.Log("SIGN: " + sign);
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
                 var speedXValue = _animationBlendLerpedX;
