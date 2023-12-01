@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
-using Unity.VisualScripting;
 using UnityEngine.VFX;
 using Utils;
 
@@ -17,9 +16,9 @@ using UnityEngine.InputSystem;
  */
 
     [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM 
-    [RequireComponent(typeof(PlayerInput))]
-#endif
+// #if ENABLE_INPUT_SYSTEM 
+//     [RequireComponent(typeof(PlayerInput))]
+// #endif
     public class ShipController : MonoBehaviour
     {
         [Header("Player")] 
@@ -156,7 +155,7 @@ using UnityEngine.InputSystem;
 #endif
         private CharacterController _controller;
         private StarterAssetsInputs _input;
-        private GameObject _mainCamera;
+        private GameplayCamera.GameplayCamera _gameplayCamera;
 
         private const float _threshold = 0.01f;
 
@@ -179,9 +178,10 @@ using UnityEngine.InputSystem;
         private void Awake()
         {
             // get a reference to our main camera
-            if (_mainCamera == null)
+            if (_gameplayCamera == null)
             {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                var mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                _gameplayCamera = mainCamera.GetComponent<GameplayCamera.GameplayCamera>();
             }
         }
 
@@ -191,9 +191,10 @@ using UnityEngine.InputSystem;
 
             _hasAnimator = ArmatureAnimator != null;
             _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
+            var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
+            _input = inputObject.GetComponent<StarterAssetsInputs>();
 #if ENABLE_INPUT_SYSTEM 
-            _playerInput = GetComponent<PlayerInput>();
+            _playerInput = inputObject.GetComponent<PlayerInput>();
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
@@ -304,8 +305,12 @@ using UnityEngine.InputSystem;
                     Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
                     var forward = transform.forward;
 
-                    var mainCamEulerAngles = _mainCamera.transform.eulerAngles;
-                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, _mainCamera.transform.rotation, ref _rotationVelocity,
+                    var mainCamEulerAngles = _gameplayCamera.transform.eulerAngles;
+
+                    var desiredRotation = Quaternion.FromToRotation(transform.position,
+                        _gameplayCamera.ShipTargetForMovement.position);
+                    
+                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, desiredRotation, ref _rotationVelocity,
                         RotationSmoothTime);
                     // Debug.Log("CamAngles: " + mainCamEulerAngles );
                     //

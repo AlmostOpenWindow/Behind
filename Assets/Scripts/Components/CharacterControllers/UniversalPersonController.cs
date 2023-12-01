@@ -11,9 +11,9 @@ using UnityEngine.InputSystem;
  */
 
     [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM 
-    [RequireComponent(typeof(PlayerInput))]
-#endif
+// #if ENABLE_INPUT_SYSTEM 
+//     [RequireComponent(typeof(PlayerInput))]
+// #endif
     public class UniversalPersonController : MonoBehaviour
     {
         [Header("Player")]
@@ -146,9 +146,10 @@ using UnityEngine.InputSystem;
 
             _hasAnimator = ArmatureAnimator != null;
             _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
+            var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
+            _input = inputObject.GetComponent<StarterAssetsInputs>();
 #if ENABLE_INPUT_SYSTEM 
-            _playerInput = GetComponent<PlayerInput>();
+            _playerInput = inputObject.GetComponent<PlayerInput>();
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
