@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using StarterAssets;
 using Unity.VisualScripting;
 using UnityEngine.VFX;
@@ -86,6 +87,9 @@ using UnityEngine.InputSystem;
         
         [Tooltip("Эффект нитро")]
         public VisualEffect nitroEffect;
+        
+        [Tooltip("Эффект задних двигателей")]
+        public List<VisualEffect> backEnginesEffect;
 
         public AudioSource nitroSound;
         
@@ -200,6 +204,11 @@ using UnityEngine.InputSystem;
 
             if (_input.move != Vector2.zero)
             {
+                foreach (var visualEffect in backEnginesEffect)
+                {
+                    visualEffect.enabled = true;
+                }
+
                 if (!flightSound.isPlaying)
                 {
                     flightSound.Play(0);
@@ -223,6 +232,10 @@ using UnityEngine.InputSystem;
 
             if (_input.move == Vector2.zero)
             {
+                foreach (var visualEffect in backEnginesEffect)
+                {
+                    visualEffect.enabled = false;
+                }
                 StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.3f, 0), flightSound.Stop));
             }
             if (!_input.sprint)
