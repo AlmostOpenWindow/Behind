@@ -215,7 +215,7 @@ using UnityEngine.InputSystem;
                 if (!flightSound.isPlaying)
                 {
                     flightSound.Play(0);
-                    StartCoroutine(FadeAudioSource.StartFade(flightSound, 0.3f, 1));
+                    StartCoroutine(FadeAudioSource.StartFade(flightSound, 0.3f, 0.1f));
                 }
             }
 
