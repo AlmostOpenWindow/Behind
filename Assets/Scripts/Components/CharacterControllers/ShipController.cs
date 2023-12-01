@@ -310,7 +310,7 @@ using UnityEngine.InputSystem;
                     var desiredRotation = Quaternion.FromToRotation(transform.position,
                         _gameplayCamera.ShipTargetForMovement.position);
                     
-                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, desiredRotation, ref _rotationVelocity,
+                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation, _gameplayCamera.MainCamera.transform.rotation, ref _rotationVelocity,
                         RotationSmoothTime);
                     // Debug.Log("CamAngles: " + mainCamEulerAngles );
                     //
