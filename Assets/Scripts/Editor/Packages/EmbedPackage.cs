@@ -39,7 +39,6 @@ namespace Editor.Packages
                         // Only retrieve packages that are currently installed in the
                         // project (and are neither Built-In nor already Embedded)
                         if (package.isDirectDependency && package.source
-                            != PackageSource.BuiltIn && package.source
                             != PackageSource.Embedded)
                         {
                             _targetPackage = package.name;
@@ -55,7 +54,7 @@ namespace Editor.Packages
 
                 if (string.IsNullOrEmpty(_targetPackage))
                 {
-                    Debug.Log("Can't find the package with name: " + _packageName);
+                    Debug.Log("Unappropriated package source or wrong name: " + _packageName);
                     return;
                 }
                 
