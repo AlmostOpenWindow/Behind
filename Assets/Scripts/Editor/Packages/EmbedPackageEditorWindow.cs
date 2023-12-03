@@ -6,17 +6,18 @@ namespace Editor.Packages
     public class EmbedPackageEditorWindow : EditorWindow
     {
         public string editorWindowText = "Enter package name: ";
- 
+        private string textInput;
         void OnGUI()
         {
-            GUILayout.Label(editorWindowText);
-            string inputText = EditorGUILayout.TextField("");
- 
+            textInput = EditorGUILayout.TextField(editorWindowText, textInput);
+            
             if (GUILayout.Button("JUST DO IT!"))
-                EmbedPackage.EmbedPackageByName(inputText);
+                EmbedPackage.EmbedPackageByName(textInput);
  
             if (GUILayout.Button("Abort"))
                 Close();
+            
+            this.Repaint();
         }
  
         [MenuItem("Window/Embed Package by Name")]

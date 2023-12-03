@@ -8,30 +8,30 @@ namespace Editor.Packages
 {
     static class EmbedPackage
     {
-        static String targetPackage;
-        static EmbedRequest Request;
-        static ListRequest LRequest;
-        private static string packageName;
+        private static string _targetPackage;
+        private static EmbedRequest _request;
+        private static ListRequest _lRequest;
+        private static string _packageName;
         
         public static void EmbedPackageByName(string name)
         {
-            if (LRequest != null && !LRequest.IsCompleted)
+            if (_lRequest != null && !_lRequest.IsCompleted)
                 return;
             
-            packageName = name;
-            LRequest = Client.List();
+            _packageName = name;
+            _lRequest = Client.List();
             EditorApplication.update += LProgress;
         }
 
         static void LProgress()
         {
-            if (LRequest.IsCompleted)
+            if (_lRequest.IsCompleted)
             {
-                if (LRequest.Status == StatusCode.Success)
+                if (_lRequest.Status == StatusCode.Success)
                 {
-                    foreach (var package in LRequest.Result)
+                    foreach (var package in _lRequest.Result)
                     {
-                        if (package.name != packageName)
+                        if (package.name != _packageName)
                             continue;
                         
                         Debug.Log("Project found: " + package.name + "\n Source: " + package.source);
@@ -42,18 +42,24 @@ namespace Editor.Packages
                             != PackageSource.BuiltIn && package.source
                             != PackageSource.Embedded)
                         {
-                            targetPackage = package.name;
+                            _targetPackage = package.name;
                             break;
                         }
                     }
 
                 }
                 else
-                    Debug.Log(LRequest.Error.message);
+                    Debug.Log(_lRequest.Error.message);
 
                 EditorApplication.update -= LProgress;
 
-                Embed(targetPackage);
+                if (string.IsNullOrEmpty(_targetPackage))
+                {
+                    Debug.Log("Can't find the package with name: " + _packageName);
+                    return;
+                }
+                
+                Embed(_targetPackage);
 
             }
         }
@@ -62,19 +68,19 @@ namespace Editor.Packages
         {
             // Embed a package in the project
             Debug.Log("Embed('" + inTarget + "') called");
-            Request = Client.Embed(inTarget);
+            _request = Client.Embed(inTarget);
             EditorApplication.update += Progress;
 
         }
 
         static void Progress()
         {
-            if (Request.IsCompleted)
+            if (_request.IsCompleted)
             {
-                if (Request.Status == StatusCode.Success)
-                    Debug.Log("Embedded: " + Request.Result.packageId);
-                else if (Request.Status >= StatusCode.Failure)
-                    Debug.Log(Request.Error.message);
+                if (_request.Status == StatusCode.Success)
+                    Debug.Log("Embedded: " + _request.Result.packageId);
+                else if (_request.Status >= StatusCode.Failure)
+                    Debug.Log(_request.Error.message);
 
                 EditorApplication.update -= Progress;
             }
