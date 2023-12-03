@@ -7469,37 +7469,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 187361271150187274, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 187361271150187274, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 187361271150187274, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 187361271150187274, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -180
-      objectReference: {fileID: 0}
-    - target: {fileID: 654844864596965796, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1484698387091508903, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
       propertyPath: m_Name
       value: SpaceshipController
-      objectReference: {fileID: 0}
-    - target: {fileID: 1484698387091508903, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3935435814464656863, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
-      propertyPath: m_Enabled
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8784074798044236927, guid: 02ddcfd00fd624782adba9ecfe8da4cb, type: 3}
       propertyPath: m_LocalPosition.x

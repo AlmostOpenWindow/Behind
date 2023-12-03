@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
+using Unity.Mathematics;
 using UnityEngine.VFX;
 using Utils;
 
@@ -33,6 +34,14 @@ namespace Components.CharacterControllers
         [Tooltip("How fast the character turns to face movement direction")]
         public float RotationSmoothTime = 1f;
 
+        public float TiltSpeed = 100f;
+
+        [Tooltip("Absolute value of max TiltAngle")]
+        public float TiltAngleMax = 90f;
+
+        [Range(0.0f, 3.0f)] 
+        public float TiltAngleMultiplier = 1f;
+        
         [Header("Acceleration and deceleration")]
         public float SpeedAcceleration = 10.0f;
 
@@ -121,8 +130,9 @@ namespace Components.CharacterControllers
         private float _animationBlendZ;
         private float _animationBlendLerpedX;
         private float _animationBlendLerpedZ;
-
-        private Vector4 _rotationVelocity;
+        
+        private Quaternion _rotationVelocity;
+        private Quaternion _tiltVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
 
@@ -134,13 +144,7 @@ namespace Components.CharacterControllers
         // animation IDs
         private int _animSpeedX;
         private int _animSpeedZ;
-
-        // private int _animIDSpeed;
-        // private int _animIDGrounded;
-        // private int _animIDJump;
-        // private int _animIDFreeFall;
-        // private int _animIDMotionSpeed;
-
+        
 #if ENABLE_INPUT_SYSTEM
         private PlayerInput _playerInput;
 #endif
@@ -201,8 +205,6 @@ namespace Components.CharacterControllers
 
         private void Update()
         {
-            //JumpAndGravity();
-            //GroundedCheck();
             Move();
 
             if (_input.move != Vector2.zero)
@@ -267,103 +269,42 @@ namespace Components.CharacterControllers
         {
             _animSpeedX = Animator.StringToHash("SpeedX");
             _animSpeedZ = Animator.StringToHash("SpeedZ");
-
-            //_animIDSpeed = Animator.StringToHash("Speed");
-            // _animIDGrounded = Animator.StringToHash("Grounded");
-            // _animIDJump = Animator.StringToHash("Jump");
-            // _animIDFreeFall = Animator.StringToHash("FreeFall");
-            // _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
         }
 
-        // private void GroundedCheck()
-        // {
-        //     // set sphere position, with offset
-        //     Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
-        //         transform.position.z);
-        //     Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
-        //         QueryTriggerInteraction.Ignore);
-        //
-        //     // update animator if using character
-        //     if (_hasAnimator)
-        //     {
-        //         ArmatureAnimator.SetBool(_animIDGrounded, Grounded);
-        //     }
-        // }
-
+        private float GetTiltShipAngle()
+        {
+            Vector3 targetDir = _gameplayCamera.ShipTargetForMovement.position - transform.position;
+            Vector3 forward = transform.forward;
+            float angle = Vector3.SignedAngle(targetDir, forward, Vector3.up) * TiltAngleMultiplier;
+            angle = Mathf.Clamp(angle, -TiltAngleMax, TiltAngleMax);
+            Debug.Log("Angle: " + angle);
+            
+            return Mathf.Abs(angle) < 1f 
+                ? 0.0f 
+                : angle;
+        }
+        
         private void Rotation()
         {
             if (!_input.lockRotation)
             {
-                //Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
                 if (_input.move != Vector2.zero)
                 {
                     Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-                    var forward = transform.forward;
 
                     var mainCamEulerAngles = _gameplayCamera.transform.eulerAngles;
 
-                    var desiredRotation = Quaternion.FromToRotation(transform.position,
-                        _gameplayCamera.ShipTargetForMovement.position);
-
-                    transform.rotation = QuaternionExtensions.SmoothDamp(transform.rotation,
-                        _gameplayCamera.MainCamera.transform.rotation, ref _rotationVelocity,
+                    var desiredRotation = _gameplayCamera.MainCamera.transform.rotation;
+                    
+                    var tiltAngle = GetTiltShipAngle();
+                    desiredRotation *= Quaternion.AngleAxis(tiltAngle, Vector3.forward);
+                    
+                    transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, desiredRotation, ref _rotationVelocity,
                         RotationSmoothTime);
-                    // Debug.Log("CamAngles: " + mainCamEulerAngles );
-                    //
-                    //
-                    // float rotationX =  Mathf.Lerp(transform.eulerAngles.x, mainCamEulerAngles.x, Time.deltaTime * RotationSmoothTime);
-                    //
-                    // float rotationY = Mathf.Lerp(transform.eulerAngles.y, mainCamEulerAngles.y, Time.deltaTime * RotationSmoothTime);
-                    // // float rotationX =  Mathf.SmoothDampAngle(transform.eulerAngles.x, mainCamEulerAngles.x, ref _rotationVelocity,
-                    // //     RotationSmoothTime);
-                    // //
-                    // // float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y, mainCamEulerAngles.y, ref _rotationVelocity,
-                    // //     RotationSmoothTime);
-                    //
-                    // Debug.Log("SmoothRot: " + new Vector2(rotationX, rotationY));
-                    // //Debug.Log("TargetRot: " + new Vector2(targetRotationX, targetRotationY) + "\nRotationEuler: " + new Vector2(rotationX, rotationY));
-                    // // rotate to face input direction relative to camera position
-                    // transform.rotation = Quaternion.Euler(rotationX, rotationY, 0.0f);
                 }
             }
-
-            // var t = transform;
-            // var delta = new Vector2(
-            //     Mathf.Abs(_input.look.x) < NoTurn 
-            //         ? 0 
-            //         : _input.look.x * RotationSpeed, 
-            //     Mathf.Abs(_input.look.y) < NoTurn 
-            //         ? 0 
-            //         : _input.look.y * RotationSpeed);
-            //
-            // var tRotation = t.rotation;
-            // var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y, Time.deltaTime * RotationSmoothTime);
-            // var smoothY = Mathf.Lerp(tRotation.eulerAngles.y, tRotation.eulerAngles.y + delta.x, Time.deltaTime * RotationSmoothTime);
-            //
-            // Quaternion newRotation = new Quaternion();
-            // newRotation.eulerAngles = new Vector3(smoothX, smoothY, 0);
-            //
-            // if (newRotation.eulerAngles.x > 90 && newRotation.eulerAngles.x < MinMaxXRotation.x + 360)
-            // {
-            //     newRotation.eulerAngles = new Vector3(
-            //         MinMaxXRotation.x,
-            //         smoothY,
-            //         0);
-            // }
-            // else
-            // if (newRotation.eulerAngles.x is >= 0 and < 90)
-            // {
-            //     newRotation.eulerAngles = new Vector3(
-            //         Mathf.Clamp(newRotation.eulerAngles.x, 0, MinMaxXRotation.y),
-            //         smoothY,
-            //         0);
-            // }
-            // transform.rotation = newRotation;
-            //if (!_input.lockRotation)
-            //    RotationToLook(transform, RotationSpeed, MinMaxXRotation, null, true);
+            
             TPCameraRotation();
-            //RotateShipModel();
-            //RotateShipModel();
         }
 
         private void RotationToLook(Transform rotatable, float rotationSpeed, Vector2? minMaxAnglesX,
@@ -432,17 +373,7 @@ namespace Components.CharacterControllers
                 }
             }
         }
-
-        private void RotateShipModel()
-        {
-            RotationToLook(ShipModel.transform, ShipModelRotationSpeed, MinMaxShipModelRotationX,
-                MinMaxShipModelRotationY, true);
-        }
-        // private void Rotation()
-        // {
-        //     FPRotation();
-        // }
-
+        
         private void TPCameraRotation()
         {
             // if there is an input and camera position is not fixed
@@ -467,29 +398,7 @@ namespace Components.CharacterControllers
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
         }
-
-        // private void FPRotation()
-        // {
-        //     // if there is an input
-        //     if (_input.look.sqrMagnitude >= _threshold)
-        //     {
-        //         //Don't multiply mouse input by Time.deltaTime
-        //         float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-        //
-        //         //_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-        //         //_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
-        //
-        //         // clamp our pitch rotation
-        //         //_cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
-        //
-        //         // Update Cinemachine camera target pitch
-        //         //CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cinemachineTargetPitch, 0.0f, 0.0f);
-        //
-        //         //TPCameraRotation();
-        //         // rotate the player left and right
-        //         //transform.Rotate(Vector3.up * _rotationVelocity);
-        //     }
-        // }
+        
 
         private void Move()
         {
@@ -534,17 +443,13 @@ namespace Components.CharacterControllers
             }
 
             FPMove();
-            //TPMove();
-
+            
             // update animator if using character
-
             var velocity = _controller.velocity;
             var localVelocity = transform.InverseTransformDirection(velocity);
-            //Debug.Log("LocalVelocity: " + localVelocity);
 
             _animationBlendX = localVelocity.x / targetAnimationSpeed;
             _animationBlendZ = localVelocity.z / targetAnimationSpeed;
-            //Debug.Log("AnimBlend: " + _animationBlendX);
 
             if (_animationBlendX < 0.01f && _animationBlendX > 0.01f) _animationBlendX = 0f;
             if (_animationBlendZ < 0.01f && _animationBlendZ > 0.01f) _animationBlendZ = 0f;
@@ -567,7 +472,7 @@ namespace Components.CharacterControllers
                     sideEnginesEffect[0].enabled = false;
                     sideEnginesEffect[1].enabled = false;
                 }
-
+                Debug.Log("SIGN: " + sign);
                 _animationBlendLerpedZ = Mathf.Lerp(_animationBlendLerpedZ, _animationBlendZ,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
@@ -577,31 +482,6 @@ namespace Components.CharacterControllers
                 ArmatureAnimator.SetFloat(_animSpeedZ, _animationBlendLerpedZ);
             }
         }
-
-
-        // private void TPMove()
-        // {
-        //     Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-        //
-        //     // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-        //     // if there is a move input rotate player when the player is moving
-        //     if (_input.move != Vector2.zero)
-        //     {
-        //         _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-        //                           _mainCamera.transform.eulerAngles.y;
-        //         float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-        //             RotationSmoothTime);
-        //
-        //         // rotate to face input direction relative to camera position
-        //         transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-        //     }
-        //     
-        //     Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-        //
-        //     // move the player
-        //     _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-        //                      new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-        // }
 
         private void FPMove()
         {

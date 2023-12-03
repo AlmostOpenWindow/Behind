@@ -13,13 +13,23 @@ namespace Components.CharacterControllers.classes
 
         public void Start()
         {
-            var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
-            _input = inputObject.GetComponent<StarterAssetsInputs>();
+            if (_input == null)
+            {
+                var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
+                _input = inputObject.GetComponent<StarterAssetsInputs>();
+            }
+           
             _input.clickFEvent += doOnInputPressed;
         }
 
         public void OnEnable()
         {
+            if (_input == null)
+            {
+                var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
+                _input = inputObject.GetComponent<StarterAssetsInputs>();
+            }
+            
             _input.clickFEvent += doOnInputPressed;
         }
 
