@@ -277,7 +277,6 @@ namespace Components.CharacterControllers
             Vector3 forward = transform.forward;
             float angle = Vector3.SignedAngle(targetDir, forward, Vector3.up) * TiltAngleMultiplier;
             angle = Mathf.Clamp(angle, -TiltAngleMax, TiltAngleMax);
-            Debug.Log("Angle: " + angle);
             
             return Mathf.Abs(angle) < 1f 
                 ? 0.0f 
@@ -286,7 +285,8 @@ namespace Components.CharacterControllers
         
         private void Rotation()
         {
-            var desiredRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0.0f);
+            var rotation = transform.rotation;
+            var desiredRotation = Quaternion.Euler(rotation.eulerAngles.x, rotation.eulerAngles.y, 0.0f);
             
             if (!_input.lockRotation)
             {
@@ -469,7 +469,7 @@ namespace Components.CharacterControllers
                     sideEnginesEffect[0].enabled = false;
                     sideEnginesEffect[1].enabled = false;
                 }
-                Debug.Log("SIGN: " + sign);
+             
                 _animationBlendLerpedZ = Mathf.Lerp(_animationBlendLerpedZ, _animationBlendZ,
                     Time.deltaTime * SpeedXAnimValueLerpTime);
                 _animationBlendLerpedX = Mathf.Lerp(_animationBlendLerpedX, _animationBlendX,
