@@ -286,23 +286,20 @@ namespace Components.CharacterControllers
         
         private void Rotation()
         {
+            var desiredRotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0.0f);
+            
             if (!_input.lockRotation)
             {
                 if (_input.move != Vector2.zero)
                 {
-                    Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
-                    var mainCamEulerAngles = _gameplayCamera.transform.eulerAngles;
-
-                    var desiredRotation = _gameplayCamera.MainCamera.transform.rotation;
-                    
                     var tiltAngle = GetTiltShipAngle();
+                    desiredRotation = _gameplayCamera.MainCamera.transform.rotation;
                     desiredRotation *= Quaternion.AngleAxis(tiltAngle, Vector3.forward);
-                    
-                    transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, desiredRotation, ref _rotationVelocity,
-                        RotationSmoothTime);
                 }
             }
+            
+            transform.rotation = QuaternionUtil.SmoothDamp(transform.rotation, desiredRotation, ref _rotationVelocity,
+                RotationSmoothTime);
             
             TPCameraRotation();
         }
