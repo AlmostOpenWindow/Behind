@@ -74,7 +74,7 @@ float DistanceAttenuation(float distanceSqr, half2 distanceAttenuation)
     
     //____MY VARIANT____
     float lightRangeSqr = rcp(distanceAttenuation.x);
-    float lightAtten = rcp(1 + 25 * distanceSqr / lightRangeSqr);
+    float lightAtten = rcp(1 + 250 * distanceSqr / lightRangeSqr);
     float2 distanceAttenuationFloat = float2(distanceAttenuation);
     //
     // // Use the smoothing factor also used in the Unity lightmapper.
