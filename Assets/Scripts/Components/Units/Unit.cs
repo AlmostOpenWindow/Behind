@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Components.Units
 {
-    public class Unit : MonoController, IUnit
+    public class Unit : PausableMonoController, IUnit
     {
         public event Action<ConfigID<UnitConfig>, Unit> DeadEvent;
         
@@ -14,5 +14,15 @@ namespace Components.Units
         private Transform _transform;
 
         public Vector3 Position => _transform.position;
+
+        public void DoPause()
+        {
+            Pause();
+        }
+
+        public void DoResume()
+        {
+            Resume();
+        }
     }
 }

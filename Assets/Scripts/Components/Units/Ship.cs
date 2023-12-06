@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace Components.Units
 {
-    public class Hero : PausableMonoController, IUnit
+    public class Ship : PausableMonoController, IUnit
     {
-        [SerializeField] private UniversalPersonController _universalPersonController;
-        [SerializeField] private Transform _transform;
-        
-        public Vector3 Position => _transform.position;
+        [SerializeField] private ShipController _shipController;
+        public Vector3 Position => transform.position;
+
         public void DoPause()
         {
             Pause();

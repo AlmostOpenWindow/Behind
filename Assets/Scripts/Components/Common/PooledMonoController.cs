@@ -1,8 +1,7 @@
 ﻿using System;
-using Components.Common;
 using Infrastructure.Containers.PoolObjectsContainer;
 
-namespace Doom.GamePlay.Components.Common
+namespace Components.Common
 {
     //todo: подумать о том, чтобы все MonoController сделать PooledMonoController
     public abstract class PooledMonoController<TStrategy> 
