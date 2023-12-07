@@ -39,7 +39,6 @@ namespace Components.CharacterControllers
 
         private void OnFlashlightClicked()
         {
-            //TODO settings system for assigning buttons
             _isTurnedOn = !_isTurnedOn;
             TurnOnOffLights(_isTurnedOn);
         }

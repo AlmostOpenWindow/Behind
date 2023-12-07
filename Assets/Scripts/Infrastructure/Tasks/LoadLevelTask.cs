@@ -23,7 +23,7 @@ namespace Infrastructure.Tasks
 
         private void SpawnHero()
         {
-            //todo 
+            //todo SpawnHero function
         }
 
         private void SpawnShip()
