@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using StarterAssets;
-using Unity.Mathematics;
+using Components.Common;
+using Infrastructure.Services.Input;
 using UnityEngine.VFX;
 using Utils;
 
@@ -20,7 +20,7 @@ namespace Components.CharacterControllers
 // #if ENABLE_INPUT_SYSTEM 
 //     [RequireComponent(typeof(PlayerInput))]
 // #endif
-    public class ShipController : MonoBehaviour
+    public class ShipController : MonoBehaviour, IUpdater, ILateUpdater
     {
         [Header("Player")] [Tooltip("Чтобы не переворачивался в мертвую петлю")]
         public Vector2 MinMaxXRotation;
@@ -149,7 +149,7 @@ namespace Components.CharacterControllers
         private PlayerInput _playerInput;
 #endif
         private CharacterController _controller;
-        private StarterAssetsInputs _input;
+        private IInputService _input;
         private GameplayCamera.GameplayCamera _gameplayCamera;
 
         private const float _threshold = 0.01f;
@@ -157,43 +157,35 @@ namespace Components.CharacterControllers
         private bool _hasAnimator;
         private Vector3 _cachedInputDirection;
 
+        private bool _constructed;
+        
         private bool IsCurrentDeviceMouse
         {
             get
             {
 #if ENABLE_INPUT_SYSTEM
-                return _playerInput.currentControlScheme == "KeyboardMouse";
+                return _input.PlayerInput.currentControlScheme == "KeyboardMouse";
 #else
 				return false;
 #endif
             }
         }
 
-
-        private void Awake()
+        public void Construct(IInputService inputService, GameplayCamera.GameplayCamera gameplayCamera)
         {
-            // get a reference to our main camera
-            if (_gameplayCamera == null)
-            {
-                var mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-                _gameplayCamera = mainCamera.GetComponent<GameplayCamera.GameplayCamera>();
-            }
-        }
+            _input = inputService;
+            _gameplayCamera = gameplayCamera;
 
+            _constructed = true;
+        }
+        
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = ArmatureAnimator != null;
             _controller = GetComponent<CharacterController>();
-            var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
-            _input = inputObject.GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM
-            _playerInput = inputObject.GetComponent<PlayerInput>();
-#else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
-#endif
-
+            
             AssignAnimationIDs();
 
             // reset our timeouts on start
@@ -202,12 +194,14 @@ namespace Components.CharacterControllers
             _nitroTimeoutDelta = 0;
         }
 
-
-        private void Update()
+        public void OnUpdate()
         {
+            if (!_constructed)
+                return;
+            
             Move();
 
-            if (_input.move != Vector2.zero)
+            if (_input.Data.move != Vector2.zero)
             {
                 foreach (var visualEffect in backEnginesEffect)
                 {
@@ -221,7 +215,7 @@ namespace Components.CharacterControllers
                 }
             }
 
-            if (_input.sprint && _nitroTimeoutDelta <= 0.0f)
+            if (_input.Data.sprint && _nitroTimeoutDelta <= 0.0f)
             {
                 nitroEffect.Play();
                 if (!nitroSound.isPlaying)
@@ -237,7 +231,7 @@ namespace Components.CharacterControllers
                 _nitroTimeoutDelta -= Time.deltaTime;
             }
 
-            if (_input.move == Vector2.zero)
+            if (_input.Data.move == Vector2.zero)
             {
                 foreach (var visualEffect in backEnginesEffect)
                 {
@@ -247,22 +241,25 @@ namespace Components.CharacterControllers
                 StartCoroutine(SecondTask(FadeAudioSource.StartFade(flightSound, 0.3f, 0), flightSound.Stop));
             }
 
-            if (!_input.sprint)
+            if (!_input.Data.sprint)
             {
                 nitroSound.Stop();
                 //StartCoroutine(SecondTask(FadeAudioSource.StartFade(nitroSound, 0.5f, 0), nitroSound.Stop));
             }
         }
 
+        public void OnLateUpdate()
+        {
+            if (!_constructed)
+                return;
+            
+            Rotation();
+        }
+
         private IEnumerator SecondTask(IEnumerator first, Action action)
         {
             yield return StartCoroutine(first);
             action();
-        }
-
-        private void LateUpdate()
-        {
-            Rotation();
         }
 
         private void AssignAnimationIDs()
@@ -288,9 +285,9 @@ namespace Components.CharacterControllers
             var rotation = transform.rotation;
             var desiredRotation = Quaternion.Euler(rotation.eulerAngles.x, rotation.eulerAngles.y, 0.0f);
             
-            if (!_input.lockRotation)
+            if (!_input.Data.lockRotation)
             {
-                if (_input.move != Vector2.zero)
+                if (_input.Data.move != Vector2.zero)
                 {
                     var tiltAngle = GetTiltShipAngle();
                     desiredRotation = _gameplayCamera.MainCamera.transform.rotation;
@@ -309,12 +306,12 @@ namespace Components.CharacterControllers
         {
             var t = rotatable;
             var delta = new Vector2(
-                Mathf.Abs(_input.look.x) < NoTurn
+                Mathf.Abs(_input.Data.look.x) < NoTurn
                     ? 0
-                    : _input.look.x * rotationSpeed,
-                Mathf.Abs(_input.look.y) < NoTurn
+                    : _input.Data.look.x * rotationSpeed,
+                Mathf.Abs(_input.Data.look.y) < NoTurn
                     ? 0
-                    : _input.look.y * rotationSpeed);
+                    : _input.Data.look.y * rotationSpeed);
 
             var tRotation = t.localRotation;
             var smoothX = Mathf.Lerp(tRotation.eulerAngles.x, tRotation.eulerAngles.x + delta.y,
@@ -374,13 +371,13 @@ namespace Components.CharacterControllers
         private void TPCameraRotation()
         {
             // if there is an input and camera position is not fixed
-            if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            if (_input.Data.look.sqrMagnitude >= _threshold && !LockCameraPosition)
             {
                 //Don't multiply mouse input by Time.deltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+                _cinemachineTargetYaw += _input.Data.look.x * deltaTimeMultiplier;
+                _cinemachineTargetPitch += _input.Data.look.y * deltaTimeMultiplier;
             }
 
             // clamp our rotations so our values are limited 360 degrees
@@ -400,17 +397,17 @@ namespace Components.CharacterControllers
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed = _input.Data.sprint ? SprintSpeed : MoveSpeed;
             var targetAnimationSpeed = targetSpeed;
             var speedAcceleration = SpeedAcceleration;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
-            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+            float inputMagnitude = _input.Data.analogMovement ? _input.Data.move.magnitude : 1f;
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
-            if (_input.move == Vector2.zero)
+            if (_input.Data.move == Vector2.zero)
             {
                 targetSpeed = 0.0f;
                 speedAcceleration = SpeedDeceleration;
@@ -454,12 +451,12 @@ namespace Components.CharacterControllers
             if (_hasAnimator)
             {
                 var sign = Math.Sign(localVelocity.x);
-                if (_input.move.x < 0)
+                if (_input.Data.move.x < 0)
                 {
                     sideEnginesEffect[1].enabled = true;
                     sideEnginesEffect[0].enabled = false;
                 }
-                else if (_input.move.x > 0)
+                else if (_input.Data.move.x > 0)
                 {
                     sideEnginesEffect[1].enabled = false;
                     sideEnginesEffect[0].enabled = true;
@@ -484,9 +481,9 @@ namespace Components.CharacterControllers
         {
             var t = transform;
 
-            if (_input.move != Vector2.zero)
+            if (_input.Data.move != Vector2.zero)
             {
-                _cachedInputDirection = t.right * _input.move.x + t.forward * _input.move.y;
+                _cachedInputDirection = t.right * _input.Data.move.x + t.forward * _input.Data.move.y;
             }
 
 
@@ -515,7 +512,7 @@ namespace Components.CharacterControllers
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                if (_input.Data.jump && _jumpTimeoutDelta <= 0.0f)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -553,7 +550,7 @@ namespace Components.CharacterControllers
                 }
 
                 // if we are not grounded, do not jump
-                _input.jump = false;
+                _input.Data.jump = false;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)

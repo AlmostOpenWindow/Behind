@@ -1780,16 +1780,17 @@ GameObject:
   m_Component:
   - component: {fileID: 409825495316355563}
   - component: {fileID: 5832632187973681045}
+  - component: {fileID: 1043011268373035924}
   - component: {fileID: 9154523004409224608}
   - component: {fileID: 4676997805551139271}
   - component: {fileID: 1467822085136729335}
   m_Layer: 8
-  m_Name: PlayerCapsule
+  m_Name: HeroPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &409825495316355563
 Transform:
   m_ObjectHideFlags: 0
@@ -1834,6 +1835,25 @@ CharacterController:
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.93, z: 0}
+--- !u!114 &1043011268373035924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6975391202452849546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ff01c5c11a44e8085dee52a0778bb9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _updatersLinks:
+  - _underlyingValue: {fileID: 4676997805551139271}
+  _fixedUpdatersLinks: []
+  _lateUpdatersLinks:
+  - _underlyingValue: {fileID: 4676997805551139271}
+  _universalPersonController: {fileID: 4676997805551139271}
+  _cameraRoot: {fileID: 1609488451785574649}
 --- !u!114 &9154523004409224608
 MonoBehaviour:
   m_ObjectHideFlags: 0

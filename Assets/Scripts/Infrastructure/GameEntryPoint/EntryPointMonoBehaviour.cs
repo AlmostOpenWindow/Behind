@@ -1,6 +1,5 @@
 using Components.Common;
 using Configs.WindowConfigs;
-using GameEntryPoint;
 using Infrastructure.Tasks;
 using UnityEngine;
 
@@ -23,6 +22,9 @@ namespace Infrastructure.GameEntryPoint
             _taskMachine = new TaskMachine(_applicationContainer);
             _taskMachine.Start();
 
+            if (_test2WindowConfig == null)
+                return;
+            
             var opened = _test2WindowConfig.TryOpen(_applicationContainer);
             Debug.Log("Window opened from EntryPoint");
         }

@@ -16,6 +16,9 @@ namespace Configs
         
         public int ConfigID => _id;
         
+        public ConfigID<TConfig> ToConfigID<TConfig>() where TConfig : BaseConfig
+            => new(this as TConfig);
+        
 #if UNITY_EDITOR
         private void OnValidate()
         {

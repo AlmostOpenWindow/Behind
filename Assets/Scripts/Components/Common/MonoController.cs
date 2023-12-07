@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AYellowpaper;
 using Doom.GamePlay.Components.Common;
 using SerializeReferenceEditor;
 using UnityEngine;
@@ -10,18 +11,18 @@ namespace Components.Common
         public List<IUpdater> _updaters = new List<IUpdater>();
         public List<IFixedUpdater> _fixedUpdaters = new List<IFixedUpdater>();
         public List<ILateUpdater> _lateUpdaters = new List<ILateUpdater>();
+
+        //[SR(typeof(IUpdaterLinker))]
+        //[SerializeReference]
+        public List<InterfaceReference<IUpdater>> _updatersLinks = new();
         
-        [SR(typeof(IUpdaterLinker))]
-        [SerializeReference]
-        public List<IUpdaterLinker> _updatersLinks = new List<IUpdaterLinker>();
+        //[SR(typeof(IFixedUpdaterLinker))]
+        //[SerializeReference]
+        public List<InterfaceReference<IFixedUpdater>> _fixedUpdatersLinks = new();
         
-        [SR(typeof(IFixedUpdaterLinker))]
-        [SerializeReference]
-        public List<IFixedUpdaterLinker> _fixedUpdatersLinks = new List<IFixedUpdaterLinker>();
-        
-        [SR(typeof(ILateUpdaterLinker))]
-        [SerializeReference]
-        public List<ILateUpdaterLinker> _lateUpdatersLinks = new List<ILateUpdaterLinker>();
+        //[SR(typeof(ILateUpdaterLinker))]
+        //[SerializeReference]
+        public List<InterfaceReference<ILateUpdater>> _lateUpdatersLinks = new();
         
         public void InitializedUnityApi()
         {
@@ -35,18 +36,18 @@ namespace Components.Common
         {
             foreach (var updater in _updatersLinks)
             {
-                if (!_updaters.Contains(updater))
-                    _updaters.Add(updater);
+                if (!_updaters.Contains(updater.Value))
+                    _updaters.Add(updater.Value);
             }
             foreach (var fixedUpdater in _fixedUpdatersLinks)
             {
-                if (!_fixedUpdaters.Contains(fixedUpdater))
-                    _fixedUpdaters.Add(fixedUpdater);
+                if (!_fixedUpdaters.Contains(fixedUpdater.Value))
+                    _fixedUpdaters.Add(fixedUpdater.Value);
             }
             foreach (var lateUpdater in _lateUpdatersLinks)
             {
-                if (!_lateUpdaters.Contains(lateUpdater))
-                    _lateUpdaters.Add(lateUpdater);
+                if (!_lateUpdaters.Contains(lateUpdater.Value))
+                    _lateUpdaters.Add(lateUpdater.Value);
             }
         }
 
@@ -115,14 +116,5 @@ namespace Components.Common
             _fixedUpdaters.Clear();
             _updaters.Clear();
         }
-
-#if UNITY_EDITOR
-
-        protected virtual void OnValidate()
-        {
-            
-        }
-
-#endif
     }
 }

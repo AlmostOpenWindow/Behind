@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameEntryPoint;
+using Infrastructure.GameEntryPoint;
 
 namespace Infrastructure.Tasks
 {

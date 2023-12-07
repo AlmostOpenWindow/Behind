@@ -1,7 +1,8 @@
 namespace Infrastructure.Factories.Units
 {
-    public interface IUnitFactory
+    public interface IUnitFactory : IFactory
     {
-        
+        void SpawnShip();
+        void SpawnHero();
     }
 }

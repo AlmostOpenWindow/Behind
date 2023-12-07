@@ -185,10 +185,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8784074798044236927}
   - component: {fileID: 6922671647588316668}
+  - component: {fileID: 7943780708112715881}
   - component: {fileID: 654844864596965796}
   - component: {fileID: 4944115369900197711}
   m_Layer: 0
-  m_Name: SpaceshipController
+  m_Name: ShipPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,6 +238,26 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0.21}
+--- !u!114 &7943780708112715881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484698387091508903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcec303fc11a416780d7b400d7363948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _updatersLinks:
+  - _underlyingValue: {fileID: 654844864596965796}
+  _fixedUpdatersLinks: []
+  _lateUpdatersLinks:
+  - _underlyingValue: {fileID: 654844864596965796}
+  _shipController: {fileID: 654844864596965796}
+  _flashlightController: {fileID: 4944115369900197711}
+  _cameraRoot: {fileID: 5582053405624173198}
 --- !u!114 &654844864596965796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -957,7 +978,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7128114454983092603}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: d99b0f27e1b30f04dbd72bd5549c594d, type: 3}

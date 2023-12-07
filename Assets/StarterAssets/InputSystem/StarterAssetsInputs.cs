@@ -1,4 +1,5 @@
 using System;
+using Infrastructure.Services.Input;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -8,22 +9,22 @@ namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
-		public event Action clickFEvent; 
+		public readonly InputData Data = new();
 		
-		[Header("Character Input Values")]
-		public Vector2 move;
-		public Vector2 look;
-		public bool jump;
-		public bool flashlight;
-		public bool sprint;
-		public bool lockRotation;
-
-		[Header("Movement Settings")]
-		public bool analogMovement;
-
-		[Header("Mouse Cursor Settings")]
-		public bool cursorLocked = true;
-		public bool cursorInputForLook = true;
+		// [Header("Character Input Values")]
+		// public Vector2 move;
+		// public Vector2 look;
+		// public bool jump;
+		// public bool flashlight;
+		// public bool sprint;
+		// public bool lockRotation;
+		//
+		// [Header("Movement Settings")]
+		// public bool analogMovement;
+		//
+		// [Header("Mouse Cursor Settings")]
+		// public bool cursorLocked = true;
+		// public bool cursorInputForLook = true;
 
 #if ENABLE_INPUT_SYSTEM
 		public void OnMove(InputValue value)
@@ -33,7 +34,7 @@ namespace StarterAssets
 
 		public void OnLook(InputValue value)
 		{
-			if(cursorInputForLook)
+			if(Data.cursorInputForLook)
 			{
 				LookInput(value.Get<Vector2>());
 			}
@@ -56,7 +57,7 @@ namespace StarterAssets
 		
 		public void OnFlashlight(InputValue value)
 		{
-			clickFEvent?.Invoke();
+			Data.TriggerFlashlightClickEvent();
 			FlashlightInput(value.isPressed);
 		}
 #endif
@@ -64,37 +65,37 @@ namespace StarterAssets
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{
-			move = newMoveDirection;
+			Data.move = newMoveDirection;
 		} 
 
 		public void LookInput(Vector2 newLookDirection)
 		{
-			look = newLookDirection;
+			Data.look = newLookDirection;
 		}
 
 		public void JumpInput(bool newJumpState)
 		{
-			jump = newJumpState;
+			Data.jump = newJumpState;
 		}
 		
 		public void FlashlightInput(bool newFlashlightState)
 		{
-			flashlight = newFlashlightState;
+			Data.flashlight = newFlashlightState;
 		}
 
 		public void SprintInput(bool newSprintState)
 		{
-			sprint = newSprintState;
+			Data.sprint = newSprintState;
 		}
 
 		public void LockRotationInput(bool lockRotationState)
 		{
-			lockRotation = lockRotationState;
+			Data.lockRotation = lockRotationState;
 		}
 		
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			SetCursorState(cursorLocked);
+			SetCursorState(Data.cursorLocked);
 		}
 
 		private void SetCursorState(bool newState)

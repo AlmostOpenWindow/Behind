@@ -1,7 +1,7 @@
 using System;
 using Windows.WindowControllers.Base;
 using Windows.WindowViews.Base;
-using GameEntryPoint;
+using Infrastructure.GameEntryPoint;
 using Infrastructure.Services.Windows;
 using JetBrains.Annotations;
 using Services.Debug;

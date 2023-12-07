@@ -1,5 +1,6 @@
 ﻿using System;
-using GameEntryPoint;
+using Infrastructure.Factories.Units;
+using Infrastructure.GameEntryPoint;
 
 namespace Infrastructure.Tasks
 {
@@ -16,9 +17,21 @@ namespace Infrastructure.Tasks
         public void Init()
         {
             //don't forget enable mechanics after init _applicationContainer.MechanicContainer.Enable();
+            SpawnShip();
             FinishedTask?.Invoke();
         }
 
+        private void SpawnHero()
+        {
+            //todo 
+        }
+
+        private void SpawnShip()
+        {
+            var unitFactory = _applicationContainer.FactoriesEntity.Get<IUnitFactory>();
+            unitFactory.SpawnShip();
+        }
+        
         public void Update()
         {
             
