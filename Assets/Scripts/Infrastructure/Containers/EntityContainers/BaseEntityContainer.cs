@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Doom.Infrastructure.Containers.LogicContainers
+namespace Infrastructure.Containers.EntityContainers
 {
     public abstract class BaseEntityContainer<TEntity>
     {

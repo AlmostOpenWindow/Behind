@@ -7,6 +7,7 @@ namespace Infrastructure.Services.Input
     public class InputData
     {
         public event Action FlashlightClickEvent;
+        public event Action InteractionClickEvent;
         
         public Vector2 move;
         public Vector2 look;
@@ -21,6 +22,11 @@ namespace Infrastructure.Services.Input
         public void TriggerFlashlightClickEvent()
         {
             FlashlightClickEvent?.Invoke();
+        }
+
+        public void TriggerInteractClickEvent()
+        {
+            InteractionClickEvent?.Invoke();
         }
     }
 }

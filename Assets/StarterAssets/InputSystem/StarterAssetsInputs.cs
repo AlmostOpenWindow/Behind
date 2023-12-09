@@ -10,21 +10,6 @@ namespace StarterAssets
 	public class StarterAssetsInputs : MonoBehaviour
 	{
 		public readonly InputData Data = new();
-		
-		// [Header("Character Input Values")]
-		// public Vector2 move;
-		// public Vector2 look;
-		// public bool jump;
-		// public bool flashlight;
-		// public bool sprint;
-		// public bool lockRotation;
-		//
-		// [Header("Movement Settings")]
-		// public bool analogMovement;
-		//
-		// [Header("Mouse Cursor Settings")]
-		// public bool cursorLocked = true;
-		// public bool cursorInputForLook = true;
 
 #if ENABLE_INPUT_SYSTEM
 		public void OnMove(InputValue value)
@@ -57,8 +42,12 @@ namespace StarterAssets
 		
 		public void OnFlashlight(InputValue value)
 		{
-			Data.TriggerFlashlightClickEvent();
 			FlashlightInput(value.isPressed);
+		}
+
+		public void OnInteract(InputValue value)
+		{
+			InteractInput();
 		}
 #endif
 
@@ -80,9 +69,15 @@ namespace StarterAssets
 		
 		public void FlashlightInput(bool newFlashlightState)
 		{
+			Data.TriggerFlashlightClickEvent();
 			Data.flashlight = newFlashlightState;
 		}
 
+		public void InteractInput()
+		{
+			Data.TriggerInteractClickEvent();
+		}
+		
 		public void SprintInput(bool newSprintState)
 		{
 			Data.sprint = newSprintState;

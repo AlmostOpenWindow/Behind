@@ -187,7 +187,8 @@ GameObject:
   - component: {fileID: 6922671647588316668}
   - component: {fileID: 7943780708112715881}
   - component: {fileID: 654844864596965796}
-  - component: {fileID: 4944115369900197711}
+  - component: {fileID: 6978181151907746947}
+  - component: {fileID: 1286484585635370969}
   m_Layer: 0
   m_Name: ShipPrefab
   m_TagString: Player
@@ -203,15 +204,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484698387091508903}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.043577887, y: 0.043577887, z: -0.0019026523, w: 0.99809736}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.36, y: 1.89, z: -29.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5582053405624173198}
   - {fileID: 187361271150187274}
+  - {fileID: 4095730635218194700}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 5, y: 5, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &6922671647588316668
 CharacterController:
   m_ObjectHideFlags: 0
@@ -255,9 +257,11 @@ MonoBehaviour:
   _fixedUpdatersLinks: []
   _lateUpdatersLinks:
   - _underlyingValue: {fileID: 654844864596965796}
-  _shipController: {fileID: 654844864596965796}
-  _flashlightController: {fileID: 4944115369900197711}
+  _dismountPoint: {fileID: 4095730635218194700}
+  _dismountEvent: {fileID: 11400000, guid: 14bb96230119b467ea0b9ebaed61abc9, type: 2}
   _cameraRoot: {fileID: 5582053405624173198}
+  _shipController: {fileID: 654844864596965796}
+  _flashlightController: {fileID: 1286484585635370969}
 --- !u!114 &654844864596965796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,7 +318,28 @@ MonoBehaviour:
   LockCameraPosition: 0
   DoCameraClamp: 1
   _speed: 0
---- !u!114 &4944115369900197711
+--- !u!65 &6978181151907746947
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484698387091508903}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.3456407, y: 1.7523535, z: 3.5841694}
+  m_Center: {x: 0.033722162, y: 0.37617677, z: -0.07750034}
+--- !u!114 &1286484585635370969
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -323,7 +348,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1484698387091508903}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81c4505ab2fd5bf4ba4bceb2e9962b74, type: 3}
+  m_Script: {fileID: 11500000, guid: 88d0fc860fe49419aa54a805f741727d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lights:
@@ -1425,6 +1450,37 @@ Transform:
   - {fileID: 5246375380437295197}
   m_Father: {fileID: 187361271150187274}
   m_LocalEulerAnglesHint: {x: -0.113, y: -12.215, z: -1.061}
+--- !u!1 &8452568919135887338
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4095730635218194700}
+  m_Layer: 0
+  m_Name: DismountPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4095730635218194700
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8452568919135887338}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 1.72, z: -0.18}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8784074798044236927}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &541958445057984796
 PrefabInstance:
   m_ObjectHideFlags: 0

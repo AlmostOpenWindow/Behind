@@ -1,5 +1,4 @@
-﻿using Doom.Infrastructure.Containers.LogicContainers;
-using Infrastructure.Factories;
+﻿using Infrastructure.Factories;
 
 namespace Infrastructure.Containers.EntityContainers
 {

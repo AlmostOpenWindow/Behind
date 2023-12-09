@@ -73,7 +73,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4730870544145228617}
   - component: {fileID: 5691206337946732069}
-  - component: {fileID: 3383456668603884949}
   - component: {fileID: 8841614025728994561}
   m_Layer: 8
   m_Name: PlayerArmature
@@ -122,32 +121,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!143 &3383456668603884949
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 365823245626413096}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8841614025728994561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1783,14 +1756,13 @@ GameObject:
   - component: {fileID: 1043011268373035924}
   - component: {fileID: 9154523004409224608}
   - component: {fileID: 4676997805551139271}
-  - component: {fileID: 1467822085136729335}
   m_Layer: 8
   m_Name: HeroPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &409825495316355563
 Transform:
   m_ObjectHideFlags: 0
@@ -1905,20 +1877,6 @@ MonoBehaviour:
   CameraAngleOverride: 0
   LockCameraPosition: 0
   IsFPCamera: 1
---- !u!114 &1467822085136729335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6975391202452849546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 639f88b3d56f6b74b946d0c3a7b6c37c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  InteractorSource: {fileID: 409825495316355563}
-  InteractRange: 2
 --- !u!1 &7061101430349783312
 GameObject:
   m_ObjectHideFlags: 0

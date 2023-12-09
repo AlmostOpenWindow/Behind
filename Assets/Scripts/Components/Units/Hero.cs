@@ -3,7 +3,6 @@ using Components.Common;
 using Configs;
 using Configs.Units;
 using Infrastructure.Services.Input;
-using StarterAssets;
 using UnityEngine;
 
 namespace Components.Units

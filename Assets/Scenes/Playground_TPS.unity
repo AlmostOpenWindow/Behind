@@ -787,7 +787,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1020,7 +1020,7 @@ Transform:
   m_GameObject: {fileID: 820653651}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 5.36, y: 1.89, z: -29.23}
+  m_LocalPosition: {x: 5.36, y: 1.18, z: -29.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1478,6 +1478,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9078993845375825671, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
+      propertyPath: m_CustomBlends
+      value: 
+      objectReference: {fileID: 11400000, guid: f520f5f2372bb4c41bdd507818796425, type: 2}
+    - target: {fileID: 9078993845375825671, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
+      propertyPath: m_DefaultBlend.m_Time
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1585,13 +1593,17 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5783383558000648386, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: d0b07152bd71d4478904c219cbb6c2d1, type: 3}
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Name
       value: VolumetricSpotLight (1)
       objectReference: {fileID: 0}
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3901,6 +3913,10 @@ PrefabInstance:
     - target: {fileID: 6423411458011284940, guid: b4c4277a8d7e746dea1a558d4d7db9ca, type: 3}
       propertyPath: m_Name
       value: SHIP_FollowCAM
+      objectReference: {fileID: 0}
+    - target: {fileID: 6423411458011284940, guid: b4c4277a8d7e746dea1a558d4d7db9ca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6692,6 +6708,10 @@ PrefabInstance:
     - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
       propertyPath: m_Name
       value: VolumetricSpotLight
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851955175926459731, guid: eef7479c9155c4079b4bb017cb549d73, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

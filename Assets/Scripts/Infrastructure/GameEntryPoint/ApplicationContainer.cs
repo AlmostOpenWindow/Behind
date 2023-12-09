@@ -1,5 +1,7 @@
 using Components.Common;
+using Configs.Mechanics;
 using Configs.Units;
+using GameEvents.Configs;
 using Infrastructure.Containers.EntityContainers;
 using Infrastructure.Containers.UnityApi;
 using UnityEngine;
@@ -26,11 +28,18 @@ namespace Infrastructure.GameEntryPoint
             MechanicContainer = new MechanicContainer(FrameUpdater, FrameUpdater, FrameUpdater);
             WorldEntity = new WorldEntityContainer();
         }
+        
     }
 
     public class ConfigCatalogs
     {
         private static string UnitConfigsCatalogPath => "Configs/Units/UnitConfigsCatalog";
         public readonly UnitConfigsCatalog UnitConfigsCatalog = Resources.Load<UnitConfigsCatalog>(UnitConfigsCatalogPath);
+
+        private static string GameEventsCatalogPath => "Configs/GameEvents/GameEventsCatalog";
+        public readonly GameEventsCatalog GameEventsCatalog = Resources.Load<GameEventsCatalog>(GameEventsCatalogPath);
+        
+        private static string MechanicsConfigsCatalogPath => "Configs/Mechanics/MechanicsCatalog";
+        public readonly MechanicsConfigsCatalog MechanicsConfigsCatalog = Resources.Load<MechanicsConfigsCatalog>(MechanicsConfigsCatalogPath);
     }
 }

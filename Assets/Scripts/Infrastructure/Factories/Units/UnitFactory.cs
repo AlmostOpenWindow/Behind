@@ -1,6 +1,9 @@
 using Components.Common;
 using Components.Units;
 using Configs.Units;
+using GameEvents.Configs;
+using GameEvents.Data;
+using GameEvents.Listeners;
 using Infrastructure.Containers.PoolObjectsContainer;
 using Infrastructure.Containers.UnityApi;
 using Infrastructure.GameEntryPoint;
@@ -16,6 +19,7 @@ namespace Infrastructure.Factories.Units
         private readonly ILogService _logService;
         private readonly IUnitsContainer _unitsContainer;
         private readonly IFrameMonoControllerSubscribe _frameMonoControllerSubscribe;
+        private readonly GameEventListener _gameEventListener;
         
         public UnitFactory(
             ApplicationContainer applicationContainer, 
@@ -32,6 +36,8 @@ namespace Infrastructure.Factories.Units
         public void SpawnShip()
         {
             var sceneData = _applicationContainer.SceneData;
+            sceneData.ShipFollowCamera.gameObject.SetActive(false);
+            
             var shipConfig = _applicationContainer.ConfigCatalogs.UnitConfigsCatalog.ShipConfig;
             var shipObj = Object.Instantiate(
                 Load(shipConfig.PrefabPath),
@@ -44,13 +50,32 @@ namespace Infrastructure.Factories.Units
                 shipConfig.ToConfigID<ShipConfig>(), 
                 _applicationContainer.ServicesEntity.Get<IInputService>(), 
                 sceneData.GameplayCamera);
-            
+
+            _unitsContainer.Ship = shipComponent;
             SubscribeMonoController(shipComponent);
+            shipComponent.Pause();
         }
 
         public void SpawnHero()
         {
+            var sceneData = _applicationContainer.SceneData;
+            sceneData.HeroFollowCamera.gameObject.SetActive(true);
+            
             var heroConfig = _applicationContainer.ConfigCatalogs.UnitConfigsCatalog.HeroConfig;
+            var heroObj = Object.Instantiate(
+                Load(heroConfig.PrefabPath),
+                sceneData.HeroInitialPoint.position,
+                sceneData.HeroInitialPoint.rotation);
+
+            var heroComponent = heroObj.GetComponent<Hero>();
+            sceneData.HeroFollowCamera.Follow = heroComponent.CameraRoot;
+            heroComponent.Construct(
+                heroConfig.ToConfigID<HeroConfig>(),
+                _applicationContainer.ServicesEntity.Get<IInputService>(),
+                sceneData.GameplayCamera);
+
+            _unitsContainer.Hero = heroComponent;
+            SubscribeMonoController(heroComponent);
         }
 
         public void SpawnUnit()

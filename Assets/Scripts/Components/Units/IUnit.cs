@@ -12,8 +12,5 @@ namespace Components.Units
         // IHealth Health { get; }
         // IParametersStorage ParametersStorage { get; }
         // IEffectHolder EffectHolder { get; }
-        
-        void DoPause();
-        void DoResume();
     }
 }
