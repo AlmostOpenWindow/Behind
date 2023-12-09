@@ -1,8 +1,9 @@
-namespace Doom.Infrastructure.Containers.UnityApi
+namespace Infrastructure.Containers.UnityApi
 {
     public interface IFrameUpdater
     {
         void Update();
-        void FixedUpdate(); 
+        void FixedUpdate();
+        void LateUpdate();
     }
 }

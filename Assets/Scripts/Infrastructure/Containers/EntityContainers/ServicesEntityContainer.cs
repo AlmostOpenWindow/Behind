@@ -1,5 +1,4 @@
-﻿using Doom.Infrastructure.Containers.UnityApi;
-using Infrastructure.Containers.UnityApi;
+﻿using Infrastructure.Containers.UnityApi;
 using Services;
 
 namespace Infrastructure.Containers.EntityContainers
@@ -14,8 +13,9 @@ namespace Infrastructure.Containers.EntityContainers
 
         public ServicesEntityContainer(
             IFrameUpdaterSubscribe frameUpdaterSubscribe, 
-            IFrameFixedUpdaterSubscribe frameFixedUpdaterSubscribe) 
-            : base(frameUpdaterSubscribe, frameFixedUpdaterSubscribe)
+            IFrameFixedUpdaterSubscribe frameFixedUpdaterSubscribe,
+            IFrameLateUpdaterSubscribe frameLateUpdaterSubscribe) 
+            : base(frameUpdaterSubscribe, frameFixedUpdaterSubscribe, frameLateUpdaterSubscribe)
         {
         }
     }

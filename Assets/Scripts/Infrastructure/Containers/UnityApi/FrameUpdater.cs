@@ -1,27 +1,31 @@
 ﻿using System.Collections.Generic;
 using Components.Common;
 using Doom.GamePlay.Components.Common;
-using Doom.Infrastructure.Containers.UnityApi;
 
 namespace Infrastructure.Containers.UnityApi
 {
-    public class FrameUpdater : IFrameUpdaterSubscribe, IFrameFixedUpdaterSubscribe, IFrameMonoControllerSubscribe, IFrameUpdater
+    public class FrameUpdater : IFrameUpdaterSubscribe,  IFrameLateUpdaterSubscribe, IFrameFixedUpdaterSubscribe, IFrameMonoControllerSubscribe, IFrameUpdater
     {
         private readonly List<IUpdater> _updaters = new List<IUpdater>();
         private readonly List<IFixedUpdater> _fixedUpdaters = new List<IFixedUpdater>();
+        private readonly List<ILateUpdater> _lateUpdaters = new List<ILateUpdater>();
         
         private readonly Stack<IUpdater> _updatersAdditionalStack = new Stack<IUpdater>();
         private readonly Stack<IFixedUpdater> _fixedUpdatersAdditionalStack = new Stack<IFixedUpdater>();
+        private readonly Stack<ILateUpdater> _lateUpdatersAdditionalStack = new Stack<ILateUpdater>();
         
         private readonly Stack<IUpdater> _updatersRemovableStack = new Stack<IUpdater>();
         private readonly Stack<IFixedUpdater> _fixedUpdatersRemovableStack = new Stack<IFixedUpdater>();
+        private readonly Stack<ILateUpdater> _lateUpdatersRemovableStack = new Stack<ILateUpdater>();
         
         private readonly Stack<MonoController> _updatersMonoControllersAdditionalStack = new Stack<MonoController>();
         private readonly Stack<MonoController> _fixedUpdatersMonoControllersAdditionalStack = new Stack<MonoController>();
+        private readonly Stack<MonoController> _lateUpdatersMonoControllersAdditionalStack = new Stack<MonoController>();
         
         private readonly Stack<MonoController> _updatersMonoControllersRemovableStack = new Stack<MonoController>();
         private readonly Stack<MonoController> _fixedUpdatersMonoControllersRemovableStack = new Stack<MonoController>();
-
+        private readonly Stack<MonoController> _lateUpdatersMonoControllersRemovableStack = new Stack<MonoController>();
+        
         public void AddUpdater(IUpdater updater)
         {
             _updatersAdditionalStack.Push(updater);
@@ -41,12 +45,23 @@ namespace Infrastructure.Containers.UnityApi
         {
             _fixedUpdatersRemovableStack.Push(fixedUpdater);
         }
+
+        public void AddLateUpdater(ILateUpdater lateUpdater)
+        {
+            _lateUpdatersAdditionalStack.Push(lateUpdater);
+        }
+
+        public void RemoveLateUpdater(ILateUpdater lateUpdater)
+        {
+            _lateUpdatersRemovableStack.Push(lateUpdater);
+        }
         
         public void AddMonoController(MonoController controller)
         {
             controller.InitializedUnityApi();
             _updatersMonoControllersAdditionalStack.Push(controller);
             _fixedUpdatersMonoControllersAdditionalStack.Push(controller);
+            _lateUpdatersMonoControllersAdditionalStack.Push(controller);
         }
         
         private void OnControllerDisable(EnabledMonoBehavior obj)
@@ -59,6 +74,8 @@ namespace Infrastructure.Containers.UnityApi
                 _updatersMonoControllersRemovableStack.Push(controller);
             if (_fixedUpdaters.Contains(controller))
                 _fixedUpdatersMonoControllersRemovableStack.Push(controller);
+            if (_lateUpdaters.Contains(controller))
+                _lateUpdatersMonoControllersRemovableStack.Push(controller);
         }
 
         public void Update()
@@ -91,6 +108,39 @@ namespace Infrastructure.Containers.UnityApi
             foreach (var updater in _updaters)
             {
                 updater.OnUpdate();
+            }
+        }
+
+        public void LateUpdate()
+        {
+            while (_lateUpdatersMonoControllersAdditionalStack.Count > 0)
+            {
+                var controller = _lateUpdatersMonoControllersAdditionalStack.Pop();
+                _lateUpdaters.Add(controller);
+                controller.DisableEvent += OnControllerDisable;
+            }
+            
+            while (_lateUpdatersAdditionalStack.Count > 0)
+            {
+                var controller = _lateUpdatersAdditionalStack.Pop();
+                _lateUpdaters.Add(controller);
+            }
+            
+            while (_lateUpdatersMonoControllersRemovableStack.Count > 0)
+            {
+                var controller = _lateUpdatersMonoControllersRemovableStack.Pop();
+                _fixedUpdaters.Remove(controller);
+            }
+            
+            while (_lateUpdatersRemovableStack.Count > 0)
+            {
+                var controller = _lateUpdatersRemovableStack.Pop();
+                _lateUpdaters.Remove(controller);
+            }
+
+            foreach (var lateUpdater in _lateUpdaters)
+            {
+                lateUpdater.OnLateUpdate();
             }
         }
 

@@ -1,13 +1,35 @@
+using Components.CharacterControllers;
 using Components.Common;
+using Configs;
+using Configs.Units;
+using Infrastructure.Services.Input;
 using UnityEngine;
 
 namespace Components.Units
 {
-    public class Hero : MonoController, IUnit
+    public class Hero : PausableMonoController, IUnit
     {
-        [SerializeField] private Transform _transform;
+        [SerializeField] private UniversalPersonController _universalPersonController;
+        [SerializeField] private Transform _cameraRoot;
+        public Vector3 Position => transform.position;
+        public Transform CameraRoot => _cameraRoot;
 
+        private ConfigID<HeroConfig> _heroConfig;
+        
+        public void Construct(ConfigID<HeroConfig> heroConfig, IInputService input, GameplayCamera.GameplayCamera gameplayCamera)
+        {
+            _heroConfig = heroConfig;
+            _universalPersonController.Construct(input, gameplayCamera);
+        }
+        
+        public void DoPause()
+        {
+            Pause();
+        }
 
-        public Vector3 Position => _transform.position;
+        public void DoResume()
+        {
+            Resume();
+        }
     }
 }

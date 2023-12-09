@@ -1,6 +1,5 @@
-﻿using Doom.Infrastructure.Containers.UnityApi;
-using Infrastructure.Containers.UnityApi;
-using Services.Mechanics;
+﻿using Infrastructure.Containers.UnityApi;
+using Infrastructure.Mechanics;
 
 namespace Infrastructure.Containers.EntityContainers
 {
@@ -16,8 +15,9 @@ namespace Infrastructure.Containers.EntityContainers
         
         public MechanicContainer(
             IFrameUpdaterSubscribe frameUpdaterSubscribe, 
-            IFrameFixedUpdaterSubscribe frameFixedUpdaterSubscribe) 
-            : base(frameUpdaterSubscribe, frameFixedUpdaterSubscribe)
+            IFrameFixedUpdaterSubscribe frameFixedUpdaterSubscribe,
+            IFrameLateUpdaterSubscribe frameLateUpdaterSubscribe) 
+            : base(frameUpdaterSubscribe, frameFixedUpdaterSubscribe, frameLateUpdaterSubscribe)
         {
         }
         

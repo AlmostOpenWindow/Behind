@@ -1,6 +1,6 @@
 using Windows.WindowControllers.Base;
 using Configs.WindowConfigs;
-using GameEntryPoint;
+using Infrastructure.GameEntryPoint;
 using UnityEngine;
 
 namespace Infrastructure.Services.Windows

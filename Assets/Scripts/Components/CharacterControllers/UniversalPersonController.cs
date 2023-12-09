@@ -1,3 +1,5 @@
+using Components.Common;
+using Infrastructure.Services.Input;
 using StarterAssets;
 
 namespace Components.CharacterControllers
@@ -14,7 +16,7 @@ using UnityEngine.InputSystem;
 // #if ENABLE_INPUT_SYSTEM 
 //     [RequireComponent(typeof(PlayerInput))]
 // #endif
-    public class UniversalPersonController : MonoBehaviour
+    public class UniversalPersonController : MonoBehaviour, IUpdater, ILateUpdater
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -111,49 +113,41 @@ using UnityEngine.InputSystem;
         private PlayerInput _playerInput;
 #endif
         private CharacterController _controller;
-        private StarterAssetsInputs _input;
-        private GameObject _mainCamera;
+        private IInputService _input;
+        private GameplayCamera.GameplayCamera _gameplayCamera;
 
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
+
+        private bool _constructed;
 
         private bool IsCurrentDeviceMouse
         {
             get
             {
 #if ENABLE_INPUT_SYSTEM
-                return _playerInput.currentControlScheme == "KeyboardMouse";
+                return _input.PlayerInput.currentControlScheme == "KeyboardMouse";
 #else
 				return false;
 #endif
             }
         }
 
-
-        private void Awake()
+        public void Construct(IInputService inputService, GameplayCamera.GameplayCamera gameplayCamera)
         {
-            // get a reference to our main camera
-            if (_mainCamera == null)
-            {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-            }
+            _input = inputService;
+            _gameplayCamera = gameplayCamera;
+            _constructed = true;
         }
-
+        
         private void Start()
         {
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = ArmatureAnimator != null;
             _controller = GetComponent<CharacterController>();
-            var inputObject = GameObject.FindGameObjectWithTag("PlayerInput");
-            _input = inputObject.GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM 
-            _playerInput = inputObject.GetComponent<PlayerInput>();
-#else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
-#endif
-
+            
             AssignAnimationIDs();
 
             // reset our timeouts on start
@@ -161,15 +155,21 @@ using UnityEngine.InputSystem;
             _fallTimeoutDelta = FallTimeout;
         }
 
-        private void Update()
+        public void OnUpdate()
         {
+            if (!_constructed)
+                return;
+            
             JumpAndGravity();
             GroundedCheck();
             Move();
         }
 
-        private void LateUpdate()
+        public void OnLateUpdate()
         {
+            if (!_constructed)
+                return;
+            
             Rotation();
         }
 
@@ -208,13 +208,13 @@ using UnityEngine.InputSystem;
         private void TPCameraRotation()
         {
             // if there is an input and camera position is not fixed
-            if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            if (_input.Data.look.sqrMagnitude >= _threshold && !LockCameraPosition)
             {
                 //Don't multiply mouse input by Time.deltaTime;
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 
-                _cinemachineTargetYaw += _input.look.x * deltaTimeMultiplier;
-                _cinemachineTargetPitch += _input.look.y * deltaTimeMultiplier;
+                _cinemachineTargetYaw += _input.Data.look.x * deltaTimeMultiplier;
+                _cinemachineTargetPitch += _input.Data.look.y * deltaTimeMultiplier;
             }
 
             // clamp our rotations so our values are limited 360 degrees
@@ -229,13 +229,13 @@ using UnityEngine.InputSystem;
         private void FPRotation()
         {
             // if there is an input
-            if (_input.look.sqrMagnitude >= _threshold)
+            if (_input.Data.look.sqrMagnitude >= _threshold)
             {
                 //Don't multiply mouse input by Time.deltaTime
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
 				
-                _cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
-                _rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
+                _cinemachineTargetPitch += _input.Data.look.y * RotationSpeed * deltaTimeMultiplier;
+                _rotationVelocity = _input.Data.look.x * RotationSpeed * deltaTimeMultiplier;
 
                 // clamp our pitch rotation
                 _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
@@ -251,19 +251,19 @@ using UnityEngine.InputSystem;
         private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+            float targetSpeed = _input.Data.sprint ? SprintSpeed : MoveSpeed;
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (_input.Data.move == Vector2.zero) targetSpeed = 0.0f;
 
             // a reference to the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
-            float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+            float inputMagnitude = _input.Data.analogMovement ? _input.Data.move.magnitude : 1f;
 
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
@@ -301,14 +301,14 @@ using UnityEngine.InputSystem;
 
         private void TPMove()
         {
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(_input.Data.move.x, 0.0f, _input.Data.move.y).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
-            if (_input.move != Vector2.zero)
+            if (_input.Data.move != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-                                  _mainCamera.transform.eulerAngles.y;
+                                  _gameplayCamera.transform.eulerAngles.y;
                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                     RotationSmoothTime);
 
@@ -327,14 +327,14 @@ using UnityEngine.InputSystem;
         private void FPMove()
         {
             // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+            Vector3 inputDirection = new Vector3(_input.Data.move.x, 0.0f, _input.Data.move.y).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
-            if (_input.move != Vector2.zero)
+            if (_input.Data.move != Vector2.zero)
             {
                 // move
-                inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
+                inputDirection = transform.right * _input.Data.move.x + transform.forward * _input.Data.move.y;
             }
 
             // move the player
@@ -362,7 +362,7 @@ using UnityEngine.InputSystem;
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                if (_input.Data.jump && _jumpTimeoutDelta <= 0.0f)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
@@ -400,7 +400,7 @@ using UnityEngine.InputSystem;
                 }
 
                 // if we are not grounded, do not jump
-                _input.jump = false;
+                _input.Data.jump = false;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)

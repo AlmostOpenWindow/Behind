@@ -1,5 +1,4 @@
 ﻿using System;
-using Doom.Infrastructure.Containers.LogicContainers;
 using Infrastructure.Containers.PoolObjectsContainer;
 
 namespace Infrastructure.Containers.EntityContainers

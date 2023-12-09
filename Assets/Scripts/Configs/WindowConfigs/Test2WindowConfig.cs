@@ -1,6 +1,6 @@
 using System;
 using Windows.WindowControllers.Base;
-using GameEntryPoint;
+using Infrastructure.GameEntryPoint;
 using Services.Debug;
 using UnityEngine;
 using WindowsViewController.WindowControllers;

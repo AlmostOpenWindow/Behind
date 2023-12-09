@@ -1,12 +1,13 @@
 ﻿using System;
-using GameEntryPoint;
 using Infrastructure.Containers.EntityContainers;
 using Infrastructure.Containers.PoolObjectsContainer;
-using Infrastructure.Randoms;
+using Infrastructure.Factories.LevelInitializers;
+using Infrastructure.Factories.Units;
+using Infrastructure.GameEntryPoint;
+using Infrastructure.Services.Randoms;
 using Infrastructure.Services.Windows;
 using Infrastructure.Time;
 using Services.Debug;
-using UnityEngine;
 
 namespace Infrastructure.Tasks
 {
@@ -32,21 +33,27 @@ namespace Infrastructure.Tasks
 
         public void Init()
         {
+            InitializeStarterFactories();
             InitializeInputs();
             InitializeServices();
             InitializeWorldContainers();
             InitializeFactories();
             
+            SpawnApplicationInfrastructurePrefabs();
+            
             FinishedTask?.Invoke();
         }
 
+        private void InitializeStarterFactories()
+        {
+            Factories.Add(new ApplicationStartFactory(_applicationContainer.FrameUpdater));
+        }
+        
         private void InitializeInputs()
         {
-            //todo input services
-            // if (Application.isMobilePlatform)
-            //     Services.Add<IInputService>(new GameplayInputService());
-            // else
-            //     Services.Add<IInputService>(new UnityEditorInputService());
+            var startFactory = Factories.Get<ApplicationStartFactory>();
+            var inputService = startFactory.SpawnPlayerInput();
+            Services.Add(inputService);
         }
 
         private void InitializeServices()
@@ -59,7 +66,11 @@ namespace Infrastructure.Tasks
 
         private void InitializeFactories()
         {
-           
+            Factories.Add<IUnitFactory>(new UnitFactory(
+                _applicationContainer,
+                Services.Get<ILogService>(),
+                _applicationContainer.WorldEntity.Get<IUnitsContainer>(),
+                _applicationContainer.FrameUpdater));
         }
 
         private void InitializeWorldContainers()
@@ -71,6 +82,11 @@ namespace Infrastructure.Tasks
             World.SetUnitsContainer(unitsContainer);
         }
 
+        private void SpawnApplicationInfrastructurePrefabs()
+        {
+            Factories.Get<ApplicationStartFactory>().SpawnInfrastructurePrefabs();
+        }
+        
         public void Update()
         {
             

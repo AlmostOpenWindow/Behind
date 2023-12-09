@@ -4,7 +4,7 @@ using System.Linq;
 using Components.Units;
 using Configs;
 using Configs.Units;
-using Infrastructure.Randoms;
+using Infrastructure.Services.Randoms;
 using Services.Debug;
 using UnityEngine;
 
@@ -24,6 +24,7 @@ namespace Infrastructure.Containers.PoolObjectsContainer
         private ConfigID<UnitConfig>[] _unitConfigs = Array.Empty<ConfigID<UnitConfig>>();
         
         private Hero _hero;
+        private Ship _ship;
 
         public UnitsContainer(ILogService logService, IRandomService randomService)
         {
@@ -39,6 +40,17 @@ namespace Infrastructure.Containers.PoolObjectsContainer
                 if (_hero != null)
                     _logService.Error("Hero is not null");
                 _hero = value;
+            }
+        }
+        
+        public Ship Ship
+        {
+            get => _ship;
+            set
+            {
+                if (_ship != null)
+                    _logService.Error("Ship is not null");
+                _ship = value;
             }
         }
 
