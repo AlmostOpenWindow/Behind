@@ -16,7 +16,7 @@ namespace Infrastructure.Services.Input
         {
             if (_assetsInputs == null)
             {
-                Debug.LogError("StarterAssetsInput NRE!");
+                Debug.LogWarning("StarterAssetsInput missing data");
                 return new InputData();
             }
 
