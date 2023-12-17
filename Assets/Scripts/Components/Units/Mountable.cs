@@ -24,7 +24,10 @@ namespace Components.Units
         public void SetMountState(bool state)
         {
             Mounted = state;
+            OnMountStateChanged(state);
         }
+
+        protected virtual void OnMountStateChanged(bool mounted) { }
         
         public override void OnUpdate()
         {

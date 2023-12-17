@@ -33,10 +33,10 @@ namespace Infrastructure.Factories.Units
             _frameMonoControllerSubscribe = frameMonoControllerSubscribe;
         }
 
-        public void SpawnShip()
+        public void SpawnShip(bool activated)
         {
             var sceneData = _applicationContainer.SceneData;
-            sceneData.ShipFollowCamera.gameObject.SetActive(false);
+            sceneData.ShipFollowCamera.gameObject.SetActive(activated);
             
             var shipConfig = _applicationContainer.ConfigCatalogs.UnitConfigsCatalog.ShipConfig;
             var shipObj = Object.Instantiate(
@@ -53,7 +53,11 @@ namespace Infrastructure.Factories.Units
 
             _unitsContainer.Ship = shipComponent;
             SubscribeMonoController(shipComponent);
-            shipComponent.Pause();
+            
+            if (activated)
+                shipComponent.Resume();
+            else
+                shipComponent.Pause();
         }
 
         public void SpawnHero()

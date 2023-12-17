@@ -39,6 +39,8 @@ namespace Components.CharacterControllers
         [Tooltip("Absolute value of max TiltAngle")]
         public float TiltAngleMax = 90f;
 
+        public float TiltAngleMin = 5f;
+        
         [Range(0.0f, 3.0f)] 
         public float TiltAngleMultiplier = 1f;
         
@@ -270,12 +272,14 @@ namespace Components.CharacterControllers
 
         private float GetTiltShipAngle()
         {
-            Vector3 targetDir = _gameplayCamera.ShipTargetForMovement.position - transform.position;
+            var camT = _gameplayCamera.transform;
+            
+            Vector3 targetDir = camT.position + camT.forward * 100f - transform.position;
             Vector3 forward = transform.forward;
             float angle = Vector3.SignedAngle(targetDir, forward, Vector3.up) * TiltAngleMultiplier;
             angle = Mathf.Clamp(angle, -TiltAngleMax, TiltAngleMax);
             
-            return Mathf.Abs(angle) < 1f 
+            return Mathf.Abs(angle) < TiltAngleMin
                 ? 0.0f 
                 : angle;
         }
@@ -290,6 +294,7 @@ namespace Components.CharacterControllers
                 if (_input.Data.move != Vector2.zero)
                 {
                     var tiltAngle = GetTiltShipAngle();
+                    Debug.Log("TILT: " + tiltAngle);
                     desiredRotation = _gameplayCamera.MainCamera.transform.rotation;
                     desiredRotation *= Quaternion.AngleAxis(tiltAngle, Vector3.forward);
                 }

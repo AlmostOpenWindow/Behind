@@ -4,8 +4,17 @@ using UnityEngine;
 
 namespace Components.Common
 {
+    public enum StartSceneType
+    {
+        StartFromPlayer,
+        StartFromShip
+    }
+    
     public class SceneData : MonoBehaviour
     {
+        [SerializeField] 
+        private StartSceneType _startSceneType;
+        
         [SerializeField]
         private GamePlayCanvas _gamePlayCanvas;
 
@@ -30,6 +39,6 @@ namespace Components.Common
         public Transform HeroInitialPoint => _heroInitialPoint;
         public CinemachineVirtualCamera ShipFollowCamera => _shipFollowCamera;
         public CinemachineVirtualCamera HeroFollowCamera => _heroFollowCamera;
-        
+        public StartSceneType StartSceneType => _startSceneType;
     }
 }

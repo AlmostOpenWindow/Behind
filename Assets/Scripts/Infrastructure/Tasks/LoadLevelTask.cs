@@ -1,4 +1,5 @@
 ﻿using System;
+using Components.Common;
 using Infrastructure.Factories.Units;
 using Infrastructure.GameEntryPoint;
 using Infrastructure.Mechanics;
@@ -24,10 +25,23 @@ namespace Infrastructure.Tasks
 
         public void Init()
         {
-            SpawnHero();
+            switch (_applicationContainer.SceneData.StartSceneType)
+            {
+                case StartSceneType.StartFromPlayer:
+                    _applicationContainer.SceneData.HeroFollowCamera.gameObject.SetActive(true);
+                    _applicationContainer.SceneData.ShipFollowCamera.gameObject.SetActive(false);
+                    SpawnHero();
+                    break;
+                case StartSceneType.StartFromShip:
+                    _applicationContainer.SceneData.HeroFollowCamera.gameObject.SetActive(false);
+                    _applicationContainer.SceneData.ShipFollowCamera.gameObject.SetActive(true);
+                    SpawnShip(true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
             InitializeMechanics();
-            
             FinishedTask?.Invoke();
         }
 
@@ -84,6 +98,12 @@ namespace Infrastructure.Tasks
         {
             var unitFactory = _applicationContainer.FactoriesEntity.Get<IUnitFactory>();
             unitFactory.SpawnHero();
+        }
+
+        private void SpawnShip(bool activated)
+        {
+            var unitFactory = _applicationContainer.FactoriesEntity.Get<IUnitFactory>();
+            unitFactory.SpawnShip(activated);
         }
         
         public void Update()

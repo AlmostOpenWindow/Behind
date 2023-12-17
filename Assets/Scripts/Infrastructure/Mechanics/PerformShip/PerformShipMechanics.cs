@@ -86,7 +86,7 @@ namespace Infrastructure.Mechanics.PerformShip
         
         private void SpawnShip()
         {
-            _unitFactory.SpawnShip();
+            _unitFactory.SpawnShip(false);
         }
     }
 }
