@@ -262,6 +262,7 @@ MonoBehaviour:
   _cameraRoot: {fileID: 5582053405624173198}
   _shipController: {fileID: 654844864596965796}
   _flashlightController: {fileID: 1286484585635370969}
+  _initRotationSmoothTime: 0.5
 --- !u!114 &654844864596965796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,6 +281,7 @@ MonoBehaviour:
   RotationSmoothTime: 0.2
   TiltSpeed: 100
   TiltAngleMax: 90
+  TiltAngleMin: 5
   TiltAngleMultiplier: 1
   SpeedAcceleration: 10
   SpeedDeceleration: 3.4
@@ -1799,6 +1801,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2385482, guid: 81a45116981bb514c866bab4841bb1fe, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 939096fc59a53d746b03d44abfd19159, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
